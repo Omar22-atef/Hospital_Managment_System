@@ -54,10 +54,6 @@ public class Doctor {
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
-
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
