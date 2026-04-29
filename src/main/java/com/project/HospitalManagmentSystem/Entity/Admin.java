@@ -37,9 +37,4 @@ public class Admin {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "admin")
-    private List<Doctor> doctors;
-    @OneToMany(mappedBy = "admin")
-    private List<Patient> patients;
 }

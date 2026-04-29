@@ -41,11 +41,7 @@ public class Patient {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
-
+    
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
