@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655",
+        danger: "#ba1a1a"
+      }
+    }
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-black text-white flex flex-col p-6 space-y-4">
+  <h1 class="text-lg font-bold">Admin Portal</h1>
+
+  <nav class="space-y-2 text-sm">
+       <a class="block bg-primary px-4 py-2 rounded" href="adminDashboard.html">Dashboard</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="patientDashboard.html">Patients</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="ourDoctors.html">Doctors</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="bookAppoinment.html">Appointments</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="payment.html">Payments</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="reportsPage.html">Reports</a>
+  </nav>
+
+  <button class="mt-auto bg-primary py-2 rounded">New Record</button>
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 flex flex-col min-h-screen">
+
+<!-- TOPBAR -->
+<header class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm">
+  <input class="hidden md:block border px-4 py-2 rounded w-64" placeholder="Search">
+
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="material-symbols-outlined">settings</span>
+    <img class="w-8 h-8 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK6-ZHOJs6ymZJjY524Qeq8vDns5B4qspl_XtPGgjHwqaQWR1LvZILO1DIxE5IOCMz7IbnT_w5jp4HZtRXvgmt1MUKdOixqxZcnslHvHGxhXVrltE8DKxKO-cBiM8yDs7oDF3XDQ-kqWHgayK-qndgde55CR7R2ecZe44EPrUXy2D1RUQxfN301GvWYfUytck8QkKU2bWrnqm4399HrE9-izX3L2HJj5vqftU6L1qiFTkD5c_yWwhhg_RV6hbBEBnGke86KptSbDw">
+  </div>
+</header>
+
+<div class="p-6 space-y-8">
+
+  <!-- HEADER -->
+  <div>
+    <h1 class="text-2xl font-bold">Hello, Alexander</h1>
+    <p class="text-muted">Your medical activity overview</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white p-6 rounded shadow flex justify-between">
+      <div>
+        <p class="text-sm text-muted">Next Appointment</p>
+        <h2 class="font-semibold">Oct 24, 10:00</h2>
+        <p class="text-sm text-muted">Dr. Sarah - Cardiology</p>
+      </div>
+      <span class="material-symbols-outlined">calendar_today</span>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow flex justify-between">
+      <div>
+        <p class="text-sm text-muted">Total Payments</p>
+        <h2 class="font-semibold">$1250</h2>
+      </div>
+      <span class="material-symbols-outlined">payments</span>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow flex justify-between">
+      <div>
+        <p class="text-sm text-muted">Active Records</p>
+        <h2 class="font-semibold">3</h2>
+      </div>
+      <span class="material-symbols-outlined">folder</span>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="grid lg:grid-cols-3 gap-6">
+
+    <!-- TABLE -->
+    <div class="lg:col-span-2 bg-white rounded shadow">
+
+      <div class="p-4 border-b flex justify-between">
+        <h3 class="font-semibold">Appointments</h3>
+        <button class="text-primary text-sm">View All</button>
+      </div>
+
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100 text-left">
+          <tr>
+            <th class="p-3">Doctor</th>
+            <th class="p-3">Date</th>
+            <th class="p-3">Dept</th>
+            <th class="p-3">Status</th>
+            <th class="p-3 text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr class="border-t">
+            <td class="p-3">Dr. Sarah</td>
+            <td class="p-3">Oct 24</td>
+            <td class="p-3">Cardiology</td>
+            <td class="p-3 text-green-600">Confirmed</td>
+            <td class="p-3 text-right">
+              ✏️ ❌
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="bg-white p-4 rounded shadow space-y-4">
+      <h3 class="font-semibold">Payments</h3>
+
+      <div class="flex justify-between text-sm">
+        <span>Consultation</span>
+        <span>$150</span>
+      </div>
+
+      <div class="flex justify-between text-sm">
+        <span>Lab Tests</span>
+        <span>$320</span>
+      </div>
+
+      <div class="flex justify-between text-sm">
+        <span>Prescription</span>
+        <button class="bg-primary text-white px-2 py-1 rounded text-xs">
+          Pay
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</main>
+
+</body>
+</html>

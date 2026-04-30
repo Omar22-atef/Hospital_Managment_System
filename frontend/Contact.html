@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & About</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655"
+      }
+    }
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex flex-col min-h-screen">
+
+<!-- NAV -->
+<header class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm">
+  <h1 class="font-bold text-primary">MedCore Systems</h1>
+
+  <nav class="hidden md:flex gap-6 text-sm">
+    <a>Home</a>
+    <a>Doctors</a>
+    <a>About</a>
+    <a class="text-primary border-b-2 border-primary">Contact</a>
+  </nav>
+
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined">notifications</span>
+    <img class="w-8 h-8 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOtEnVwnQ38GXXySkcr0dILOMoeeFGBtu-NoCcU8GsL-SQiTB1E-Z5SfKYloEZcaRONlwpEvqcLSe-BNo9HvNv6YKOITmdIQkpoTnx_j-E0Di_Rmqou9sAAadlzOrBSeCH5Q8wMA-YtlGJks1aso1KuEszBVgpjNQuhpWQ4yCYIPh0-ovjaufwPO2mbEkWtrZ4XkSTb1f7hoEHHmwi89VM8N6HYwM_R4BHGHwGde7fbm6lRxFCub1mJ8ADBKLjcrsb9e2GqtjUcS4">
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-12 space-y-16 flex-grow">
+
+<!-- ABOUT -->
+<section class="grid lg:grid-cols-2 gap-10 items-center">
+
+  <div class="space-y-4">
+    <h1 class="text-3xl font-bold">Pioneering Healthcare Excellence</h1>
+
+    <p class="text-muted">
+      We combine advanced medical technology with personalized care to deliver the highest standards in healthcare.
+    </p>
+
+    <div class="flex gap-4">
+      <div class="bg-white p-4 rounded shadow text-center">
+        <h2 class="text-primary text-xl font-bold">15+</h2>
+        <p class="text-sm text-muted">Years Experience</p>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow text-center">
+        <h2 class="text-primary text-xl font-bold">50k</h2>
+        <p class="text-sm text-muted">Patients / Year</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-72 bg-gray-200 rounded"></div>
+
+</section>
+
+<!-- CONTACT -->
+<section>
+
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-bold">Get in Touch</h2>
+    <p class="text-muted">We’re here to help you</p>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6">
+
+    <!-- FORM -->
+    <div class="bg-white p-6 rounded shadow space-y-4">
+
+      <input class="w-full border p-2 rounded" placeholder="Full Name">
+      <input class="w-full border p-2 rounded" placeholder="Email">
+      <input class="w-full border p-2 rounded" placeholder="Subject">
+      <textarea class="w-full border p-2 rounded" rows="4" placeholder="Message"></textarea>
+
+      <button class="w-full bg-primary text-white py-2 rounded">
+        Send Message
+      </button>
+
+    </div>
+
+    <!-- INFO -->
+    <div class="space-y-4">
+
+      <div class="bg-white p-4 rounded shadow text-center">
+        <span class="material-symbols-outlined text-primary">call</span>
+        <p>1-800-MED-CORE</p>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow text-center">
+        <span class="material-symbols-outlined text-primary">mail</span>
+        <p>info@medcore.sys</p>
+      </div>
+
+      <div class="bg-white h-48 rounded shadow flex items-center justify-center text-muted">
+        Map
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FAQ -->
+<section class="max-w-3xl mx-auto space-y-4">
+
+  <h2 class="text-2xl font-bold text-center">FAQs</h2>
+
+  <div class="bg-white p-4 rounded shadow">
+    <h3 class="font-semibold">Visiting hours?</h3>
+    <p class="text-sm text-muted">9 AM - 8 PM daily</p>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow">
+    <h3 class="font-semibold">Insurance?</h3>
+    <p class="text-sm text-muted">We accept most providers</p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="border-t text-center p-6 text-sm text-muted">
+  © 2024 MedCore Systems
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655"
+      }
+    }
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex flex-col min-h-screen">
+
+<!-- NAV -->
+<nav class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm">
+  <h1 class="text-xl font-bold text-primary">MedCore Systems</h1>
+
+  <div class="flex items-center gap-4">
+    <input class="hidden md:block px-4 py-2 border rounded w-64" placeholder="Search">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="material-symbols-outlined">settings</span>
+    <img class="w-8 h-8 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-vwWFIsaIQ262jdy8qshKFPepFVmWRqHRLt38DIdjEGmxlAtST4QeDyY_tfFLTJdG6mY4ZVPXejA3iWnVQIp0tiUEGmw30W3JmRwb73IbkBwku0RxrDXdVcBk0TySEfc4NDAJOjTAAX4BzDtltWsJJn_Q-5njB8x3nd-NzGX82KT6vDB7Layz_0eWPo37K_gcB-JjBactjMNmc4KqZ_-GHuYu92du4egWYDa_cZou-bQP8iTOkLDtIKJxcbQR8WDfrygIjlTRq1k">
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-3 gap-6 flex-grow">
+
+<!-- LEFT -->
+<section class="lg:col-span-2 space-y-6">
+
+  <!-- DOCTOR -->
+  <div class="bg-white p-6 rounded shadow flex gap-4 items-center">
+    <img class="w-20 h-20 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0EuCH7Z9H0h6TM3oG96IRuq-y8DY5YBPJgtRuOAM46DMHkN7Qbz8Te6DhsVEC86YNjasQlvsfvYdieVO_12URex1Z7KsRlGKf04ACcsI0xvEms3VO2xfSJXBvB9ptQIfMQUhgE1AJXn79q3JahrQRhXwzqGRCd7jMI_ICfbSplUwDHqDDzdr2O0ThPmf5Rt8J9B3Joli8K8bk5k-EwiA2s3tNUc4hivZ63nwpYLT4jVwUBp7g6s9x17oduJpv7KHkOBVvnOUcuxw">
+
+    <div>
+      <h2 class="font-semibold">Dr. Sarah Jenkins</h2>
+      <p class="text-primary text-sm">Cardiology</p>
+      <p class="text-sm text-muted">⭐ 4.9 • Main Campus</p>
+    </div>
+  </div>
+
+  <!-- DATE -->
+  <div class="bg-white p-6 rounded shadow">
+    <h3 class="font-semibold mb-4">Select Date</h3>
+
+    <div class="grid grid-cols-7 gap-2 text-center text-sm">
+      <button class="p-2">1</button>
+      <button class="p-2">2</button>
+      <button class="p-2">3</button>
+      <button class="p-2 bg-primary text-white rounded-full">14</button>
+      <button class="p-2">15</button>
+    </div>
+  </div>
+
+  <!-- TIME -->
+  <div class="bg-white p-6 rounded shadow">
+    <h3 class="font-semibold mb-4">Available Times</h3>
+
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <button class="border p-2 rounded">09:00</button>
+      <button class="border p-2 rounded">09:30</button>
+      <button class="bg-primary text-white p-2 rounded">10:00</button>
+      <button class="border p-2 rounded line-through text-gray-400">10:30</button>
+      <button class="border p-2 rounded">11:00</button>
+      <button class="border p-2 rounded">11:30</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- RIGHT -->
+<aside class="bg-white p-6 rounded shadow h-fit sticky top-20">
+
+  <h3 class="font-semibold mb-4">Patient Details</h3>
+
+  <form class="space-y-4 text-sm">
+    <input class="w-full border p-2 rounded" value="John Doe" readonly>
+    <input class="w-full border p-2 rounded" value="johndoe@email.com" readonly>
+    <input class="w-full border p-2 rounded" value="+123456789" readonly>
+
+    <textarea class="w-full border p-2 rounded" placeholder="Reason"></textarea>
+
+    <div class="flex justify-between text-sm">
+      <span>Fee</span>
+      <span class="font-semibold">$150</span>
+    </div>
+
+    <button class="w-full bg-primary text-white py-3 rounded" onclick="location.href='payment.html'">
+      Confirm Appointment
+    </button>
+  </form>
+
+</aside>
+
+</main>
+
+<footer class="border-t text-center p-6 text-sm text-muted">
+  © 2024 MedCore Systems
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655",
+        danger: "#ba1a1a"
+      }
+    }
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-black text-white flex flex-col p-6 space-y-4">
+  <h1 class="text-lg font-bold">Admin Portal</h1>
+
+  <nav class="space-y-2 text-sm">
+    <a class="block bg-primary px-4 py-2 rounded" href="adminDashboard.html">Dashboard</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="patientDashboard.html">Patients</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="ourDoctors.html">Doctors</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="bookAppoinment.html">Appointments</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="payment.html">Payments</a>
+    <a class="block px-4 py-2 hover:bg-gray-800" href="reportsPage.html">Reports</a>
+  </nav>
+
+  <button class="mt-auto bg-primary py-2 rounded">New Record</button>
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 flex flex-col min-h-screen">
+
+<!-- HEADER -->
+<header class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm">
+  <h2 class="font-bold text-primary">MedCore Systems</h2>
+
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="material-symbols-outlined">settings</span>
+    <img class="w-8 h-8 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZNcc1ulks6ELrO3UyVuwte-V_KRjaWawEKsgtvdVNLPV9iygkNVY19yb_DVncTiz02v9DBxGT7CHNrj_kTyyKYrIcp2d-P69qBbzkrvG4wBRqwApeJez0FyT0QddqmjmZJUZmNqeAga4jR7ga-J5ziWFPPFCbXFu4vQzkYIourwf5HojSMkaJBBete8-EA2sR4irK4dmQk9TP3pdyJ63ipKl8k868wpTfgcBIQqZVrE54tFDA4PJsaE0hvzTQyiulHvW_DIqx0Tc">
+  </div>
+</header>
+
+<div class="p-6 space-y-8">
+
+  <!-- HEADER -->
+  <div class="flex justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Dashboard Overview</h1>
+      <p class="text-muted">Hospital summary</p>
+    </div>
+
+    <div class="flex gap-3">
+      <button class="border px-4 py-2 rounded text-primary">Add Patient</button>
+      <button class="bg-primary text-white px-4 py-2 rounded">Add Doctor</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid md:grid-cols-4 gap-6">
+
+    <div class="bg-white p-6 rounded shadow">
+      <p class="text-sm text-muted">Revenue</p>
+      <h2 class="font-semibold">$124,500</h2>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+      <p class="text-sm text-muted">Doctors</p>
+      <h2 class="font-semibold">142</h2>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+      <p class="text-sm text-muted">Patients</p>
+      <h2 class="font-semibold">8432</h2>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+      <p class="text-sm text-muted">Bookings</p>
+      <h2 class="font-semibold">324</h2>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="grid lg:grid-cols-3 gap-6">
+
+    <!-- ACTIVITY -->
+    <div class="lg:col-span-2 bg-white rounded shadow">
+
+      <div class="p-4 border-b flex justify-between">
+        <h3 class="font-semibold">Activity</h3>
+        <button class="text-primary text-sm">View All</button>
+      </div>
+
+      <div class="p-4 space-y-4 text-sm">
+        <p>New patient registered</p>
+        <p>Payment processed</p>
+        <p>Appointment booked</p>
+        <p>Urgent lab result</p>
+      </div>
+
+    </div>
+
+    <!-- STATUS -->
+    <div class="bg-white p-6 rounded shadow text-center">
+      <h3 class="font-semibold mb-2">System Status</h3>
+      <p class="text-sm text-muted mb-4">All systems operational</p>
+      <button class="border px-4 py-2 rounded">View Logs</button>
+    </div>
+
+  </div>
+
+</div>
+
+<footer class="text-center text-sm text-muted p-6 border-t">
+  © 2024 MedCore Systems
+</footer>
+
+</main>
+
+</body>
+</html>

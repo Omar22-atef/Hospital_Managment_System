@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Details</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655",
+        danger: "#ba1a1a"
+      }
+    }
+  }
+}
+</script>
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex flex-col min-h-screen">
+
+<!-- NAV -->
+<header class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm">
+  <h1 class="text-xl font-bold text-primary">MedCore Systems</h1>
+
+  <div class="flex items-center gap-4">
+    <input class="hidden md:block border px-3 py-1 rounded" placeholder="Search">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="material-symbols-outlined">settings</span>
+    <img class="w-8 h-8 rounded-full"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuC91-6nyBbOzgCXjRNbJ229hCIOYxiLTGcOCE2M4iaJvaB9uBeOJIYW2rjUUBuUfddMg2wjctV4ezLgrSsPXnZ8w9AtPmm7Y8eSi2XgRCpE5bqOXf53CT_gDMsLBj4fDEOdwbIGMSqN2BEFMo2veGapNcyoEPbAVG6MeBq30CaDZnIcLUfpjn9f4sYWYIyeXC035xM8FZL71Jd0Pc1VFbBAJXF0sfKmQFHY8v47yixSg3uoq2a_lxoSIrDj6yKq4_I2JWNw17Zon2U">
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-8 flex-grow">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <a class="text-primary text-sm">← Back</a>
+    <h1 class="text-2xl font-bold">Appointment Details</h1>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+
+    <!-- LEFT -->
+    <section class="lg:col-span-2 space-y-6">
+
+      <!-- STATUS -->
+      <div class="bg-white border rounded p-4 flex justify-between items-center">
+        <div class="flex gap-2 text-sm">
+          <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">Scheduled</span>
+          <span class="bg-green-100 text-green-700 px-2 py-1 rounded">Paid</span>
+        </div>
+        <span class="text-sm text-muted">Ref: #APT-849201</span>
+      </div>
+
+      <!-- DOCTOR -->
+      <div class="bg-white border rounded p-4 flex gap-4 items-center">
+        <img class="w-12 h-12 rounded-full"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBprE4RcdiD5B7LPOM8NNfFVQXbZTFmdcKsyq1z6qBDDX4LOBcHPNdGf4GqMH9dyftwDwX2oJu0fV0bfCwZ4XMpWI1ofDMwSVUuSQXhb9IU34ElA8yg1OGI4YEIMwF82cP8QgYNsAuWjPxgSu0pOhdkK89pA8neoABRPis42FLauI39e6yVAjdQ5KSrErxQQbl0a1CBub2KnjG4vx_zL9Xa7xkpQpyAQ8REVQKIwPlU8w-qplC1dd6-TUBF0h4rqyx8zC-HovWJXF0">
+
+        <div>
+          <h3 class="font-semibold">Dr. Sarah Jenkins</h3>
+          <p class="text-primary text-sm">Cardiology</p>
+        </div>
+      </div>
+
+      <!-- PATIENT -->
+      <div class="bg-white border rounded p-4">
+        <h3 class="font-semibold mb-2">Patient</h3>
+        <p>Michael Thompson</p>
+        <p class="text-sm text-muted">DOB: 1982 • MRN: 9923</p>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="bg-white border rounded p-4 grid sm:grid-cols-3 gap-4 text-sm">
+        <div>📅 24 Oct 2024</div>
+        <div>⏰ 10:30 - 11:15</div>
+        <div>📍 Room 304</div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="bg-white border rounded p-4">
+        <h3 class="font-semibold mb-2">Reason</h3>
+        <p class="text-muted">
+          Routine follow-up after pacemaker installation.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="space-y-6">
+
+      <!-- ACTIONS -->
+      <div class="bg-white border rounded p-4 space-y-3">
+        <h3 class="font-semibold">Manage</h3>
+
+        <button class="w-full border border-primary text-primary py-2 rounded"onclick="location.href='rescheduleAppoinment.html'">
+          Reschedule
+        </button>
+
+        <button class="w-full bg-danger text-white py-2 rounded">
+          Cancel
+        </button>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="bg-white border rounded p-4 space-y-2">
+        <h3 class="font-semibold">Documents</h3>
+
+        <a class="block text-sm" onclick="location.href='appointmentDetails.html'">Appointment Summary</a>
+        <a class="block text-sm">Payment Receipt</a>
+        <a class="block text-sm">Questionnaire</a>
+      </div>
+
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="border-t text-center p-6 text-sm text-muted">
+  © 2024 MedCore Systems
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctors - MedCore Systems</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655"
+      }
+    }
+  }
+}
+</script>
+
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0; }
+</style>
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex flex-col min-h-screen">
+
+<!-- NAV -->
+<nav class="flex justify-between items-center px-6 h-16 bg-white border-b shadow-sm sticky top-0 z-50">
+  <div class="flex items-center gap-4">
+    <h1 class="text-xl font-bold text-primary">MedCore Systems</h1>
+    <input class="hidden md:block px-4 py-2 border rounded w-64" placeholder="Search doctors...">
+  </div>
+
+  <div class="hidden md:flex gap-6 text-sm">
+    <a>Home</a>
+    <a class="text-primary border-b-2 border-primary">Doctors</a>
+    <a>About</a>
+    <a>Contact</a>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined">notifications</span>
+    <span class="material-symbols-outlined">settings</span>
+    <img class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB15SNk_PagoEGWkhT6sZRupfS5xOBsYqOB7vQt68Wmeko3wv_JU6GhaztVgnDdfZf5RyGXQptHR8th2mh_ZcU97AgjE73NuSaz5VzP_ZlQgfosj-_0ggb8cakU6vZmU3dmNEX_6nOuwBjVawUzIEjKoFV4MY-qBpCArrjALNImbkeYu7HUgQ2IgLcqVTxFl4f-6rIwnmHNu52PtDfqQMeA0SHV0LpWVEQbby7NZz2PGxu7hxDWg2lb7BNq9owqTfxBPh7AmblBBUc">
+  </div>
+</nav>
+
+<main class="flex-grow max-w-7xl mx-auto px-6 py-8 flex gap-6">
+
+<!-- SIDEBAR -->
+<aside class="w-[260px] hidden md:block">
+  <div class="bg-white p-6 rounded shadow">
+    <h3 class="font-semibold mb-4">Filter</h3>
+
+    <div class="space-y-2 text-sm">
+      <label><input type="radio" name="s" checked> All</label><br>
+      <label><input type="radio" name="s"> Cardiology</label><br>
+      <label><input type="radio" name="s"> Pediatrics</label><br>
+      <label><input type="radio" name="s"> Neurology</label><br>
+      <label><input type="radio" name="s"> Orthopedics</label><br>
+      <label><input type="radio" name="s"> Dermatology</label>
+    </div>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<section class="flex-1">
+
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold">Our Specialists</h1>
+    <p class="text-muted">Find and book appointments easily.</p>
+  </div>
+
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+    <!-- CARD TEMPLATE -->
+    <div class="bg-white rounded shadow p-6 flex flex-col items-center text-center">
+      <img class="w-24 h-24 rounded-full mb-3"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5ZkjkqQHQWiaLKZw95r0oecDfeBhUvO1k7TzdKpFh6wyc0THZqaX9i9RIrG4LtE8M3WW6IaLaCTuBY2mxAFhZEhSUCeHRBcRWwsinl9f-wqAaJ0dOEXiuLeHW8lJuYB_m9r8VWUpZsOOTM8W1lxqtzXx3vKw_ZFUjQP10zvtE2QzsM4pjxhR0fyPCCGBSoHRkP2TFYZJU3fTCVhEpaLq1yEMMVfufe6tcxg7UMbHglVy1mycAghoPggO9kyZxpRg5Yoj4_a1rbI4">
+
+      <h2 class="font-semibold">Dr. Sarah Johnson</h2>
+      <span class="text-primary text-sm mb-3">Cardiology</span>
+
+      <div class="text-sm text-muted mb-4">
+        Mon, Wed, Fri<br>
+        09:00 - 17:00
+      </div>
+
+      <div class="flex gap-2 w-full">
+        <button class="border border-primary text-primary flex-1 py-2 rounded" onclick="location.href='doctorProfile.html'">Details</button>
+        <button class="bg-primary text-white flex-1 py-2 rounded" onclick="location.href='bookAppoinment.html'">Book</button>
+      </div>
+    </div>
+
+    <!-- Repeat same structure for other doctors -->
+    
+  </div>
+
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t text-center p-6 text-sm text-muted">
+  © 2024 MedCore Systems
+</footer>
+
+</body>
+</html>

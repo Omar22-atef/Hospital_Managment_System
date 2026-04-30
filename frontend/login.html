@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0057cd",
+        bg: "#f8f9fa",
+        border: "#e1e3e4",
+        text: "#191c1d",
+        muted: "#424655"
+      }
+    }
+  }
+}
+</script>
+
+</head>
+
+<body class="bg-bg text-text font-[Inter] flex items-center justify-center min-h-screen">
+
+<main class="w-full max-w-md">
+
+  <div class="bg-white p-8 rounded-xl shadow border text-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center justify-center gap-2 mb-6">
+      <span class="material-symbols-outlined text-primary">medical_services</span>
+      <h1 class="text-xl font-bold text-primary">MedCore Systems</h1>
+    </div>
+
+    <!-- HEADER -->
+    <h2 class="text-lg font-semibold mb-1">Welcome Back</h2>
+    <p class="text-sm text-muted mb-6">Sign in to continue</p>
+
+    <!-- FORM -->
+    <form class="space-y-4 text-left">
+
+      <!-- EMAIL -->
+      <div>
+        <label class="text-sm">Email</label>
+        <input type="email"
+          class="w-full border rounded p-2 mt-1"
+          placeholder="doctor@hospital.com">
+      </div>
+
+      <!-- PASSWORD -->
+      <div>
+        <div class="flex justify-between text-sm">
+          <label>Password</label>
+          <a class="text-primary">Forgot?</a>
+        </div>
+        <input type="password"
+          class="w-full border rounded p-2 mt-1"
+          placeholder="••••••••">
+      </div>
+
+      <!-- REMEMBER -->
+      <div class="flex items-center gap-2 text-sm">
+        <input type="checkbox">
+        <span class="text-muted">Remember me</span>
+      </div>
+
+      <!-- BUTTON -->
+      <button class="w-full bg-primary text-white py-2 rounded">
+        Login
+      </button>
+
+    </form>
+
+    <!-- FOOTER -->
+    <p class="text-sm text-muted mt-6">
+      Don't have an account?
+      <a class="text-primary">Register</a>
+    </p>
+
+  </div>
+
+  <p class="text-center text-xs text-muted mt-4">
+    Secure environment
+  </p>
+
+</main>
+
+</body>
+</html>
