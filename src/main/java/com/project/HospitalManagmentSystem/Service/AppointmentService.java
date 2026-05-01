@@ -1,9 +1,9 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
 import org.springframework.stereotype.Service;
 
-import com.project.HospitalManagmentSystem.Entity.Appointment;
-import com.project.HospitalManagmentSystem.Repository.AppointmentRepository;
+import com.project.HospitalManagmentSystem.entity.Appointment;
+import com.project.HospitalManagmentSystem.repository.AppointmentRepository;
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
 
 @Service

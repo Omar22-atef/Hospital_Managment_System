@@ -21,9 +21,6 @@ public class AppointmentRequestDTO {
     @NotNull(message = "Appointment Time is required")
     private LocalTime appointmentTime;
 
-    @NotNull(message = "Appointment Status is required")
-    private AppointmentStatus status;
-
     @NotNull(message = "Patient ID is required")
     private Long patientId;
 

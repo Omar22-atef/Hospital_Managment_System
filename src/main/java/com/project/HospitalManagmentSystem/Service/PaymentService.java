@@ -1,10 +1,10 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
-import com.project.HospitalManagmentSystem.Entity.Payment;
-import com.project.HospitalManagmentSystem.Repository.PaymentRepository;
-import com.project.HospitalManagmentSystem.Repository.AppointmentRepository;
+import com.project.HospitalManagmentSystem.entity.Payment;
+import com.project.HospitalManagmentSystem.repository.PaymentRepository;
+import com.project.HospitalManagmentSystem.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -22,7 +22,6 @@ public class PaymentService {
 
         Payment payment = Payment.builder()
                 .amount(request.getAmount())
-                .paymentStatus(request.getPaymentStatus())
                 .paymentMethod(request.getPaymentMethod())
                 .appointment(appointment)
                 .build();
@@ -44,8 +43,6 @@ public class PaymentService {
                 .paymentStatus(p.getPaymentStatus())
                 .paymentMethod(p.getPaymentMethod())
                 .appointmentId(p.getAppointment().getId())
-                .createdAt(p.getCreatedAt())
-                .updatedAt(p.getUpdatedAt())
                 .build();
     }
 }

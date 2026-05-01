@@ -1,9 +1,9 @@
-package com.project.HospitalManagmentSystem.Controller;
+package com.project.HospitalManagmentSystem.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.project.HospitalManagmentSystem.Service.AppointmentService;
+import com.project.HospitalManagmentSystem.service.AppointmentService;
 import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.CancelRequest;
 

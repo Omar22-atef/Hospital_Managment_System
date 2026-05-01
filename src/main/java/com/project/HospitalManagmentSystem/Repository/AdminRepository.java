@@ -1,6 +1,6 @@
-package com.project.HospitalManagmentSystem.Repository;
+package com.project.HospitalManagmentSystem.repository;
 
-import com.project.HospitalManagmentSystem.Entity.Admin;
+import com.project.HospitalManagmentSystem.entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

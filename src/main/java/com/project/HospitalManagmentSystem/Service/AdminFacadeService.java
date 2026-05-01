@@ -1,14 +1,13 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
-import com.project.HospitalManagmentSystem.Entity.Doctor;
-import com.project.HospitalManagmentSystem.Repository.*;
+import com.project.HospitalManagmentSystem.entity.Doctor;
+import com.project.HospitalManagmentSystem.repository.*;
 import com.project.HospitalManagmentSystem.dto.DoctorRequestDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.PatientResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

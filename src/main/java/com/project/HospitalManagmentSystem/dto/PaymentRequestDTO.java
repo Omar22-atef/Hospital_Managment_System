@@ -16,9 +16,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentRequestDTO {
-    @NotNull(message = "Payment Status is required")
-    private PaymentStatus paymentStatus;
-
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;

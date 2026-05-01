@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Entity;
+package com.project.HospitalManagmentSystem.entity;
 
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
 import jakarta.persistence.*;

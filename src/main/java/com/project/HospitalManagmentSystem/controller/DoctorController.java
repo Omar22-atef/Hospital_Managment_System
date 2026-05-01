@@ -1,10 +1,10 @@
-package com.project.HospitalManagmentSystem.Controller;
+package com.project.HospitalManagmentSystem.controller;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import com.project.HospitalManagmentSystem.Service.DoctorService;
+import com.project.HospitalManagmentSystem.service.DoctorService;
 import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;

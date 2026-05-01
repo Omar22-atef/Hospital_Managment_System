@@ -19,8 +19,6 @@ public class AppointmentResponseDTO {
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
     private AppointmentStatus status;
-    private PatientResponseDTO patient;
-    private DoctorResponseDTO doctor;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Long patientId;
+    private Long doctorId;
 }

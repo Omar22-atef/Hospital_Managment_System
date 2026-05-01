@@ -1,16 +1,33 @@
 package com.project.HospitalManagmentSystem.mapper;
 
-import com.project.HospitalManagmentSystem.Entity.Payment;
+import com.project.HospitalManagmentSystem.entity.Payment;
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
+import com.project.HospitalManagmentSystem.enums.PaymentStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-@Mapper(componentModel = "spring")
 public interface PaymentMapper {
-    @Mapping(target = "appointment.id", source = "appointmentId")
-    Payment toEntity(PaymentRequestDTO dto);
+    public static Payment toEntity(PaymentRequestDTO dto) {
+        if (dto == null) return null;
 
-    @Mapping(target = "appointmentId", source = "appointment.id")
-    PaymentResponseDTO toResponseDTO(Payment entity);
+        Payment payment = new Payment();
+        payment.setAmount(dto.getAmount());
+        payment.setPaymentMethod(dto.getPaymentMethod());
+
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+
+        return payment;
+    }
+
+    public static PaymentResponseDTO toDTO(Payment entity) {
+        if (entity == null) return null;
+
+        return PaymentResponseDTO.builder()
+                .id(entity.getId())
+                .amount(entity.getAmount())
+                .paymentMethod(entity.getPaymentMethod())
+                .paymentStatus(entity.getPaymentStatus())
+                .appointmentId(entity.getAppointment().getId())
+                .build();
+    }
 }

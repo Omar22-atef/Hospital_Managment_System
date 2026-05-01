@@ -18,6 +18,4 @@ public class PatientResponseDTO {
     private String email;
     private String phone;
     private LocalDate dateOfBirth;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

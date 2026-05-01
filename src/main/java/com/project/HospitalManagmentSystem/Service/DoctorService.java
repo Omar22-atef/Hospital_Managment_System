@@ -1,13 +1,13 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import com.project.HospitalManagmentSystem.Entity.Appointment;
-import com.project.HospitalManagmentSystem.Entity.Doctor;
-import com.project.HospitalManagmentSystem.Repository.AppointmentRepository;
-import com.project.HospitalManagmentSystem.Repository.DoctorRepository;
+import com.project.HospitalManagmentSystem.entity.Appointment;
+import com.project.HospitalManagmentSystem.entity.Doctor;
+import com.project.HospitalManagmentSystem.repository.AppointmentRepository;
+import com.project.HospitalManagmentSystem.repository.DoctorRepository;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.mapper.AppointmentMapper;
@@ -37,7 +37,7 @@ public class DoctorService {
    
     public DoctorResponseDTO getDoctorById(Long id) {
         Doctor doctor = findDoctorOrThrow(id);
-        return doctorMapper.toResponseDTO(doctor);
+        return DoctorMapper.toDTO(doctor);
     }
 
     
@@ -48,7 +48,7 @@ public class DoctorService {
         List<Appointment> appointments = appointmentRepository.findByDoctor(doctor);
 
         return appointments.stream()
-                .map(appointmentMapper::toResponseDTO)
+                .map(AppointmentMapper::toDTO)
                 .toList();
     }
 

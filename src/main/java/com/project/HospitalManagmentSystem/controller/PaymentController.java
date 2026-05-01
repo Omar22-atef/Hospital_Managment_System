@@ -1,6 +1,6 @@
-package com.project.HospitalManagmentSystem.Controller;
+package com.project.HospitalManagmentSystem.controller;
 
-import com.project.HospitalManagmentSystem.Service.PaymentService;
+import com.project.HospitalManagmentSystem.service.PaymentService;
 import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;

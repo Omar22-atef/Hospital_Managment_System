@@ -1,6 +1,6 @@
-package com.project.HospitalManagmentSystem.Controller;
+package com.project.HospitalManagmentSystem.controller;
 
-import com.project.HospitalManagmentSystem.Service.AdminFacadeService;
+import com.project.HospitalManagmentSystem.service.AdminFacadeService;
 import com.project.HospitalManagmentSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

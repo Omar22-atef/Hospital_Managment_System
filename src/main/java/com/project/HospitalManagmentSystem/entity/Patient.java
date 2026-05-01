@@ -1,27 +1,25 @@
-package com.project.HospitalManagmentSystem.Entity;
+package com.project.HospitalManagmentSystem.entity;
 
-import com.project.HospitalManagmentSystem.enums.DaysOfWeek;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 @Entity
-@Table(name = "Doctor")
+@Table(name = "Patient")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Doctor {
+public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -30,34 +28,22 @@ public class Doctor {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(length = 20)
-    private String phone;
-
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    @JsonIgnore
     private String password;
 
-    @Column(nullable = false)
-    private String specialization;
+    @Column(length = 20)
+    private String phone;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DaysOfWeek dayOfWeek;
+    private LocalDate dateOfBirth;
 
-    @Column(nullable = false)
-    private LocalTime startTime;
-
-    @Column(nullable = false)
-    private LocalTime endTime;
-
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
-
+    
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

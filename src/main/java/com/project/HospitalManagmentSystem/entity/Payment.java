@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Entity;
+package com.project.HospitalManagmentSystem.entity;
 
 import com.project.HospitalManagmentSystem.enums.PaymentMethod;
 import com.project.HospitalManagmentSystem.enums.PaymentStatus;

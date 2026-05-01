@@ -20,6 +20,4 @@ public class PaymentResponseDTO {
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private Long appointmentId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
