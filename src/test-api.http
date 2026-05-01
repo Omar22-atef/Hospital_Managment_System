@@ -1,0 +1,33 @@
+### 1. Get Admin Dashboard
+GET http://localhost:8080/api/admin/dashboard
+Accept: application/json
+
+###
+
+### 2. Create a New Doctor (Admin Task)
+POST http://localhost:8080/api/admin/doctors
+Content-Type: application/json
+
+{
+  "name": "Dr. ahmed",
+  "email": "ahmed.test@hospital.com",
+  "password": "miu203010",
+  "specialization": "pediatric",
+  "phone": "0107705322",
+  "dayOfWeek": "SATURDAY",
+  "startTime": "08:00:00",
+  "endTime": "15:00:00"
+}
+
+###
+
+### 3. Create a Payment
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+
+{
+  "appointmentId": 1,
+
+  "paymentStatus": "PAID",
+  "paymentMethod": "CREDIT_CARD"
+}
