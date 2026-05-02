@@ -1,5 +1,12 @@
-package com.project.HospitalManagmentSystem.service;
-
+package com.project.HospitalManagmentSystem.Service;
+import com.project.HospitalManagmentSystem.enums.PaymentStatus;
+import com.project.HospitalManagmentSystem.enums.PaymentMethod;
+import java.util.Map;
+import java.util.HashMap;
+import java.math.BigDecimal;
+import com.stripe.Stripe;
+import com.stripe.model.Charge;
+import com.stripe.exception.StripeException;
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
 import com.project.HospitalManagmentSystem.entity.Payment;
@@ -17,17 +24,38 @@ public class PaymentService {
     private final AppointmentRepository appointmentRepository;
 
     public PaymentResponseDTO createPayment(PaymentRequestDTO request) {
-        var appointment = appointmentRepository.findById(request.getAppointmentId())
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        // 1. Initialize Stripe (Use a test key from Stripe dashboard)
+        Stripe.apiKey = "sk_test_your_key_here";
 
-        Payment payment = Payment.builder()
-                .amount(request.getAmount())
-                .paymentMethod(request.getPaymentMethod())
-                .appointment(appointment)
-                .build();
+        try {
+            // 2. Create the Charge params
+            Map<String, Object> params = new HashMap<>();
+            // Stripe uses cents (e.g., $10.00 = 1000)
+            params.put("amount", request.getAmount().multiply(new BigDecimal(100)).intValue());
+            params.put("currency", "usd");
+            params.put("description", "Hospital Bill - Appointment #" + request.getAppointmentId());
+            params.put("source", request.getStripeToken());
 
-        Payment saved = paymentRepository.save(payment);
-        return mapToResponse(saved);
+            // 3. Make the actual charge
+            Charge charge = Charge.create(params);
+
+            // 4. If successful, save to your DB
+            var appointment = appointmentRepository.findById(request.getAppointmentId())
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+            Payment payment = Payment.builder()
+                    .amount(request.getAmount())
+                    .paymentStatus(PaymentStatus.PAID)
+                    .paymentMethod(PaymentMethod.CREDIT_CARD)
+                    .stripePaymentId(charge.getId()) // Save the Stripe ID!
+                    .appointment(appointment)
+                    .build();
+
+            return mapToResponse(paymentRepository.save(payment));
+
+        } catch (StripeException e) {
+            throw new RuntimeException("Stripe Payment Failed: " + e.getMessage());
+        }
     }
 
     public List<PaymentResponseDTO> getAllPayments() {

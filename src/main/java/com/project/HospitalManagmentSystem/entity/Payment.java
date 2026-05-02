@@ -45,4 +45,7 @@ public class Payment {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "stripe_payment_id")
+    private String stripePaymentId;
 }
