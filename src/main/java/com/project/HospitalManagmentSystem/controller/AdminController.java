@@ -1,6 +1,6 @@
 package com.project.HospitalManagmentSystem.controller;
 
-import com.project.HospitalManagmentSystem.service.AdminFacadeService;
+import com.project.HospitalManagmentSystem.Service.AdminFacadeService;
 import com.project.HospitalManagmentSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+
 public class AdminController {
 
     private final AdminFacadeService adminFacade;

@@ -9,7 +9,7 @@ import com.project.HospitalManagmentSystem.service.EmailService;
 @RequestMapping("/test")
 public class EmailTestController {
 
-    @Autowired
+    //@Autowired
     private EmailService emailService;
 
     @GetMapping("/email")

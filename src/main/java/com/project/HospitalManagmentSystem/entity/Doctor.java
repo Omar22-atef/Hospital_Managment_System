@@ -40,6 +40,9 @@ public class Doctor {
     @JsonIgnore
     private String password;
 
+    @Column(length = 512)
+    private String token;
+
     @Column(nullable = false)
     private String specialization;
 

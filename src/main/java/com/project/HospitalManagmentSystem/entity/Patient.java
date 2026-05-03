@@ -37,13 +37,16 @@ public class Patient {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 512)
+    private String token;
+
     private LocalDate dateOfBirth;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
-    
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

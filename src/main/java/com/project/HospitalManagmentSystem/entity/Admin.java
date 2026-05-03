@@ -30,6 +30,9 @@ public class Admin {
     @Column(nullable = false)
     private String password;
 
+    @Column(length = 512)
+    private String token;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

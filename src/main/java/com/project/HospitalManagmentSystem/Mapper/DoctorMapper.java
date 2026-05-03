@@ -1,12 +1,14 @@
-package com.project.HospitalManagmentSystem.mapper;
+package com.project.HospitalManagmentSystem.Mapper;
 
 import com.project.HospitalManagmentSystem.entity.Doctor;
 import com.project.HospitalManagmentSystem.dto.DoctorRequestDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-public interface DoctorMapper {
-    public static Doctor toEntity(DoctorRequestDTO dto) {
+@Component
+public class DoctorMapper {
+
+    public Doctor toEntity(DoctorRequestDTO dto) {
         if (dto == null) return null;
 
         Doctor doctor = new Doctor();
@@ -22,8 +24,7 @@ public interface DoctorMapper {
         return doctor;
     }
 
-    // 🔹 Entity → Response
-    public static DoctorResponseDTO toDTO(Doctor entity) {
+    public DoctorResponseDTO toDTO(Doctor entity) {
         if (entity == null) return null;
 
         return DoctorResponseDTO.builder()

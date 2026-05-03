@@ -1,7 +1,9 @@
-package com.project.HospitalManagmentSystem.service;
+package com.project.HospitalManagmentSystem.Service;
+
+import com.project.HospitalManagmentSystem.Repository.*;
 
 import com.project.HospitalManagmentSystem.entity.Doctor;
-import com.project.HospitalManagmentSystem.repository.*;
+
 import com.project.HospitalManagmentSystem.dto.DoctorRequestDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.PatientResponseDTO;

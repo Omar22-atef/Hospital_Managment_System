@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.repository;
+package com.project.HospitalManagmentSystem.Repository;
 
 import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.entity.Doctor;

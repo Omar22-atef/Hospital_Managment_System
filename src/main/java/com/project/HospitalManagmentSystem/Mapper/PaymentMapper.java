@@ -1,11 +1,10 @@
-package com.project.HospitalManagmentSystem.mapper;
+package com.project.HospitalManagmentSystem.Mapper;
 
 import com.project.HospitalManagmentSystem.entity.Payment;
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
 import com.project.HospitalManagmentSystem.enums.PaymentStatus;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+
 public interface PaymentMapper {
     public static Payment toEntity(PaymentRequestDTO dto) {
         if (dto == null) return null;
