@@ -25,4 +25,6 @@ public class PaymentRequestDTO {
 
     @NotNull(message = "Appointment ID is required")
     private Long appointmentId;
+
+    private String stripeToken;
 }

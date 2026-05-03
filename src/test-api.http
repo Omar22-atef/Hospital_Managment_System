@@ -31,3 +31,4 @@ Content-Type: application/json
   "paymentStatus": "PAID",
   "paymentMethod": "CREDIT_CARD"
 }
+
