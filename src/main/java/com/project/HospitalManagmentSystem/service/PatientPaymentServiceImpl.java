@@ -15,9 +15,9 @@ import java.util.List;
 public class PatientPaymentServiceImpl implements PatientPaymentService {
     private final PaymentRepository paymentRepository;
 
-    public List<PaymentResponseDTO> getPayments(Long patientId)
+    public List<PaymentResponseDTO> getPayments(String email)
     {
-        List<Payment> payments = paymentRepository.findByAppointmentPatientId(patientId);
+        List<Payment> payments = paymentRepository.findByAppointmentPatientEmail(email);
 
         return payments.stream().map(PaymentMapper::toDTO).toList();
     }

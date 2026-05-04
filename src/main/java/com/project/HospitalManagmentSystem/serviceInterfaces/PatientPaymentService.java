@@ -5,5 +5,5 @@ import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
 import java.util.List;
 
 public interface PatientPaymentService {
-    List<PaymentResponseDTO> getPayments(Long patientId);
+    List<PaymentResponseDTO> getPayments(String email);
 }

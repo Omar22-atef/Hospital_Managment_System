@@ -16,9 +16,9 @@ public class PatientAppointmentServiceImpl implements PatientAppointmentService 
     private final AppointmentRepository appointmentRepository;
 
     @Override
-    public List<AppointmentResponseDTO> getAllAppointments(Long patientId)
+    public List<AppointmentResponseDTO> getAllAppointments(String email)
     {
-        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+        List<Appointment> appointments = appointmentRepository.findByPatientEmail(email);
         return appointments.stream()
                 .map(AppointmentMapper::toDTO)
                 .toList();

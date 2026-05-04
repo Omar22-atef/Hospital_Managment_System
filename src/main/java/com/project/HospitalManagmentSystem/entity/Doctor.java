@@ -47,13 +47,13 @@ public class Doctor {
     private String specialization;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "day_of_week", nullable = false)
     private DaysOfWeek dayOfWeek;
 
-    @Column(nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)

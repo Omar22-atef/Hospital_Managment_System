@@ -1,5 +1,6 @@
 package com.project.HospitalManagmentSystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.HospitalManagmentSystem.enums.DaysOfWeek;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,7 @@ public class DoctorRequestDTO {
     @NotNull(message = "Start Time is required")
     private LocalTime startTime;
 
+    @JsonFormat(pattern = "HH:mm:ss")
     @NotNull(message = "End Time is required")
     private LocalTime endTime;
 }

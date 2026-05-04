@@ -29,4 +29,20 @@ public class PatientProfileServiceImpl implements PatientProfileService {
 
         return PatientMapper.toDTO(patientRepository.save(patient));
     }
+
+    public PatientResponseDTO getPatientByEmail(String email) {
+        Patient patient = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Patient Not Found"));
+
+        return PatientMapper.toDTO(patient);
+    }
+
+    public PatientResponseDTO updatePatientByEmail(String email, PatientUpdateRequestDTO dto) {
+        Patient patient = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Patient Not Found"));
+
+        PatientMapper.updatePatient(patient, dto);
+
+        return PatientMapper.toDTO(patientRepository.save(patient));
+    }
 }

@@ -10,6 +10,7 @@ import com.project.HospitalManagmentSystem.serviceInterfaces.PatientProfileServi
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,30 +19,39 @@ import java.util.List;
 @RequestMapping("/api/patient")
 @RequiredArgsConstructor
 public class PatientController {
+
     private final PatientProfileService profileService;
     private final PatientAppointmentService appointmentService;
     private final PatientPaymentService paymentService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PatientResponseDTO> getPatient(@PathVariable Long id) {
-        return ResponseEntity.ok(profileService.getPatientById(id));
+    // Get my profile
+    @GetMapping("/me")
+    public ResponseEntity<PatientResponseDTO> getMyProfile(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(profileService.getPatientByEmail(email));
     }
 
-    @PutMapping("/{id}")
+    // Update my profile
+    @PutMapping("/me")
     public ResponseEntity<PatientResponseDTO> updatePatient(
-            @PathVariable Long id,
-           @Valid @RequestBody PatientUpdateRequestDTO dto) {
+            Authentication authentication,
+            @Valid @RequestBody PatientUpdateRequestDTO dto) {
 
-        return ResponseEntity.ok(profileService.updatePatient(id, dto));
+        String email = authentication.getName();
+        return ResponseEntity.ok(profileService.updatePatientByEmail(email, dto));
     }
 
-    @GetMapping("/{id}/appointments")
-    public ResponseEntity<List<AppointmentResponseDTO>> getAppointments(@PathVariable Long id) {
-        return ResponseEntity.ok(appointmentService.getAllAppointments(id));
+    // Get my appointments
+    @GetMapping("/appointments")
+    public ResponseEntity<List<AppointmentResponseDTO>> getAppointments(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(appointmentService.getAllAppointments(email));
     }
 
-    @GetMapping("/{id}/payments")
-    public ResponseEntity<List<PaymentResponseDTO>> getPayments(@PathVariable Long id) {
-        return ResponseEntity.ok(paymentService.getPayments(id));
+    // Get my payments
+    @GetMapping("/payments")
+    public ResponseEntity<List<PaymentResponseDTO>> getPayments(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(paymentService.getPayments(email));
     }
 }
