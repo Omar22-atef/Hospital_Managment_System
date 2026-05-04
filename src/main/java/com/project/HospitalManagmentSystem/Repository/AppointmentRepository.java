@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Repository;
+package com.project.HospitalManagmentSystem.repository;
 
 import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.entity.Doctor;
@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-List<Appointment> findByDoctor(Doctor doctor);
-List<Appointment> findByPatientId(Long patientId);
+    List<Appointment> findByDoctor(Doctor doctor);
+    List<Appointment> findByPatientId(Long patientId);
 }

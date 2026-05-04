@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Mapper;
+package com.project.HospitalManagmentSystem.mapper;
 
 import com.project.HospitalManagmentSystem.entity.Admin;
 import com.project.HospitalManagmentSystem.dto.AdminRequestDTO;

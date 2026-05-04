@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Repository;
+package com.project.HospitalManagmentSystem.repository;
 
 import com.project.HospitalManagmentSystem.entity.PasswordResetToken;
 import com.project.HospitalManagmentSystem.enums.UserRole;

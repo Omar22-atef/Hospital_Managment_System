@@ -3,23 +3,23 @@ package com.project.HospitalManagmentSystem.service;
 import org.springframework.stereotype.Service;
 
 import com.project.HospitalManagmentSystem.entity.Appointment;
-import com.project.HospitalManagmentSystem.Repository.AppointmentRepository;
+import com.project.HospitalManagmentSystem.repository.AppointmentRepository;
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
 
 @Service
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final com.project.HospitalManagmentSystem.service.EmailService emailService;
+    private final EmailService emailService;
 
-    
+
     public AppointmentService(AppointmentRepository appointmentRepository,
                               EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.emailService = emailService;
     }
 
-  
+
     public void cancelAppointment(Long id, String reason) {
 
         if (reason == null || reason.isBlank()) {
@@ -40,7 +40,7 @@ public class AppointmentService {
 
         String patientEmail = appointment.getPatient().getEmail();
 
-      
+
         String message = "Your appointment on "
                 + appointment.getAppointmentDate() + " at "
                 + appointment.getAppointmentTime()
@@ -62,7 +62,7 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    
+
     public void completeAppointment(Long id) {
 
         Appointment appointment = appointmentRepository.findById(id)

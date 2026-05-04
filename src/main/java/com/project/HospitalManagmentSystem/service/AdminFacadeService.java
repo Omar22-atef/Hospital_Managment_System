@@ -1,6 +1,6 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
-import com.project.HospitalManagmentSystem.Repository.*;
+import com.project.HospitalManagmentSystem.repository.*;
 
 import com.project.HospitalManagmentSystem.entity.Doctor;
 

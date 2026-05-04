@@ -1,4 +1,4 @@
-package com.project.HospitalManagmentSystem.Service;
+package com.project.HospitalManagmentSystem.service;
 
 import com.project.HospitalManagmentSystem.config.JwtUtil;
 import com.project.HospitalManagmentSystem.dto.ForgotPasswordRequestDTO;
@@ -8,12 +8,11 @@ import com.project.HospitalManagmentSystem.dto.RegisterRequestDTO;
 import com.project.HospitalManagmentSystem.dto.ResetPasswordRequestDTO;
 import com.project.HospitalManagmentSystem.entity.*;
 import com.project.HospitalManagmentSystem.enums.UserRole;
-import com.project.HospitalManagmentSystem.Repository.AdminRepository;
-import com.project.HospitalManagmentSystem.Repository.DoctorRepository;
-import com.project.HospitalManagmentSystem.Repository.PatientRepository;
-import com.project.HospitalManagmentSystem.Repository.OtpTokenRepository;
-import com.project.HospitalManagmentSystem.Repository.PasswordResetTokenRepository;
-import com.project.HospitalManagmentSystem.service.EmailService;
+import com.project.HospitalManagmentSystem.repository.AdminRepository;
+import com.project.HospitalManagmentSystem.repository.DoctorRepository;
+import com.project.HospitalManagmentSystem.repository.PatientRepository;
+import com.project.HospitalManagmentSystem.repository.OtpTokenRepository;
+import com.project.HospitalManagmentSystem.repository.PasswordResetTokenRepository;
 import com.project.HospitalManagmentSystem.serviceInterfaces.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,6 +52,11 @@ public class AuthService implements IAuthService {
                         .name(request.getName())
                         .email(request.getEmail())
                         .password(hashedPassword)
+                        .phone(request.getPhone())
+                        .specialization(request.getSpecialization())
+                        .dayOfWeek(request.getDayOfWeek())
+                        .startTime(request.getStartTime())
+                        .endTime(request.getEndTime())
                         .build();
                 doctorRepository.save(doctor);
             }
@@ -61,6 +65,8 @@ public class AuthService implements IAuthService {
                         .name(request.getName())
                         .email(request.getEmail())
                         .password(hashedPassword)
+                        .phone(request.getPhone())
+                        .dateOfBirth(request.getDateOfBirth())
                         .build();
                 patientRepository.save(patient);
             }

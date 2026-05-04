@@ -1,15 +1,14 @@
-package com.project.HospitalManagmentSystem.Mapper;
+package com.project.HospitalManagmentSystem.mapper;
 
 import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.dto.AppointmentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class AppointmentMapper {
-
-    public Appointment toEntity(AppointmentRequestDTO dto) {
+public interface AppointmentMapper {
+    public static Appointment toEntity(AppointmentRequestDTO dto) {
         if (dto == null) return null;
 
         Appointment appointment = new Appointment();
@@ -20,7 +19,7 @@ public class AppointmentMapper {
         return appointment;
     }
 
-    public AppointmentResponseDTO toDTO(Appointment entity) {
+    public static AppointmentResponseDTO toDTO(Appointment entity) {
         if (entity == null) return null;
 
         return AppointmentResponseDTO.builder()
