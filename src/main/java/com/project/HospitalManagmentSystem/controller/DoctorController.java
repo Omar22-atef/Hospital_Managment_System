@@ -8,6 +8,7 @@ import com.project.HospitalManagmentSystem.service.DoctorService;
 import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -21,22 +22,26 @@ public class DoctorController {
     }
 
     
-    @GetMapping("/{id}")
-    public ApiResponse<DoctorResponseDTO> getDoctor(@PathVariable Long id) {
+   @GetMapping("/me")
+public ApiResponse<DoctorResponseDTO> getMyProfile(Authentication authentication) {
 
-        return new ApiResponse<>(
-                "Doctor fetched successfully",
-                doctorService.getDoctorById(id)
-        );
-    }
+    String email = authentication.getName();
+
+    return new ApiResponse<>(
+            "Doctor fetched successfully",
+            doctorService.getDoctorByEmail(email)
+    );
+}
 
     
-    @GetMapping("/{id}/appointments")
-    public ApiResponse<List<AppointmentResponseDTO>> getAppointments(@PathVariable Long id) {
+    @GetMapping("/appointments")
+public ApiResponse<List<AppointmentResponseDTO>> getAppointments(Authentication authentication) {
 
-        return new ApiResponse<>(
-                "Appointments fetched successfully",
-                doctorService.getDoctorAppointments(id)
-        );
-    }
+    String email = authentication.getName();
+
+    return new ApiResponse<>(
+            "Appointments fetched successfully",
+            doctorService.getDoctorAppointmentsByEmail(email)
+    );
+}
 }
