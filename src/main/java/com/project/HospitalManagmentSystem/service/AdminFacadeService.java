@@ -7,6 +7,8 @@ import com.project.HospitalManagmentSystem.entity.Doctor;
 import com.project.HospitalManagmentSystem.dto.DoctorRequestDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.PatientResponseDTO;
+import com.project.HospitalManagmentSystem.repository.PatientRepository;
+import com.project.HospitalManagmentSystem.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class AdminFacadeService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    private final PaymentRepository paymentRepository;
+    private final com.project.HospitalManagmentSystem.repository.PaymentRepository paymentRepository;
 
     // --- 1. Dashboard Logic ---
     public Map<String, Object> getDashboardData() {

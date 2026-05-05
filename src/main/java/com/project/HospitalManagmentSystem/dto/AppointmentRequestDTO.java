@@ -26,4 +26,6 @@ public class AppointmentRequestDTO {
 
     @NotNull(message = "Doctor ID is required")
     private Long doctorId;
+
+    private Long appointmentId;
 }
