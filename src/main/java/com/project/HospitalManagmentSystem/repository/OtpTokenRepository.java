@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface OtpTokenRepository extends JpaRepository<OtpToken, Long> {
 
     Optional<OtpToken> findByEmailAndUserRoleAndIsUsedFalse(String email, UserRole userRole);
+
+    void deleteAllByEmailAndUserRole(String email, UserRole userRole);
 }

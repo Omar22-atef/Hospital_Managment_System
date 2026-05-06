@@ -12,11 +12,11 @@ import com.project.HospitalManagmentSystem.repository.AdminRepository;
 import com.project.HospitalManagmentSystem.repository.DoctorRepository;
 import com.project.HospitalManagmentSystem.repository.PatientRepository;
 import com.project.HospitalManagmentSystem.repository.OtpTokenRepository;
-import com.project.HospitalManagmentSystem.repository.PasswordResetTokenRepository;
 import com.project.HospitalManagmentSystem.serviceInterfaces.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -29,48 +29,31 @@ public class AuthService implements IAuthService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final OtpTokenRepository otpTokenRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    // ✅ REMOVED: PasswordResetTokenRepository (was never used)
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
     @Override
     public void register(RegisterRequestDTO request) {
+
+        // ✅ Only PATIENT can self-register
+        // DOCTOR is added by Admin via /api/admin/doctors
+        // ADMIN cannot be registered from outside
+        if (request.getRole() != UserRole.PATIENT) {
+            throw new RuntimeException("Only patients can register. Doctors are added by the Admin.");
+        }
+
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        switch (request.getRole()) {
-            case ADMIN -> {
-                Admin admin = Admin.builder()
-                        .name(request.getName())
-                        .email(request.getEmail())
-                        .password(hashedPassword)
-                        .build();
-                adminRepository.save(admin);
-            }
-            case DOCTOR -> {
-                Doctor doctor = Doctor.builder()
-                        .name(request.getName())
-                        .email(request.getEmail())
-                        .password(hashedPassword)
-                        .phone(request.getPhone())
-                        .specialization(request.getSpecialization())
-                        .dayOfWeek(request.getDayOfWeek())
-                        .startTime(request.getStartTime())
-                        .endTime(request.getEndTime())
-                        .build();
-                doctorRepository.save(doctor);
-            }
-            case PATIENT -> {
-                Patient patient = Patient.builder()
-                        .name(request.getName())
-                        .email(request.getEmail())
-                        .password(hashedPassword)
-                        .phone(request.getPhone())
-                        .dateOfBirth(request.getDateOfBirth())
-                        .build();
-                patientRepository.save(patient);
-            }
-        }
+        Patient patient = Patient.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(hashedPassword)
+                .phone(request.getPhone())
+                .dateOfBirth(request.getDateOfBirth())
+                .build();
+        patientRepository.save(patient);
     }
 
     @Override
@@ -124,6 +107,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    @Transactional
     public void forgotPassword(ForgotPasswordRequestDTO request) {
         String email = request.getEmail();
         UserRole role = request.getRole();
@@ -137,6 +121,9 @@ public class AuthService implements IAuthService {
         if (!exists) {
             throw new RuntimeException("User not found");
         }
+
+        // ✅ FIX: Delete old OTPs first to avoid duplicate rows
+        otpTokenRepository.deleteAllByEmailAndUserRole(email, role);
 
         String otp = String.format("%06d", new Random().nextInt(999999));
 
@@ -154,6 +141,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    @Transactional
     public void resetPassword(ResetPasswordRequestDTO request) {
         OtpToken otpToken = otpTokenRepository
                 .findByEmailAndUserRoleAndIsUsedFalse(request.getEmail(), request.getRole())
@@ -190,8 +178,8 @@ public class AuthService implements IAuthService {
             }
         }
 
-        otpToken.setIsUsed(true);
-        otpTokenRepository.save(otpToken);
+        // ✅ FIX: Delete OTP after use instead of just marking it as used
+        otpTokenRepository.delete(otpToken);
     }
 
     @Override
