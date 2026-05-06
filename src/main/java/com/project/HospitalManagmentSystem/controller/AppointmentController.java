@@ -1,6 +1,8 @@
 package com.project.HospitalManagmentSystem.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.project.HospitalManagmentSystem.service.AppointmentService;
@@ -21,18 +23,19 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<?> cancelAppointment(@PathVariable Long id,
                                                @RequestBody CancelRequest request) {
 
-        appointmentService.cancelAppointment(id, request.getReason());
+        appointmentService.cancelAppointment(id, request.getCancelReason());
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>("Appointment cancelled and email sent", id)
         );
     }
 
-    
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PatchMapping("/{id}/confirm")
     public ResponseEntity<?> confirmAppointment(@PathVariable Long id) {
 
@@ -43,7 +46,7 @@ public class AppointmentController {
         );
     }
 
-    
+    @PreAuthorize("hasRole('DOCTOR')")
     @PatchMapping("/{id}/complete")
     public ResponseEntity<?> completeAppointment(@PathVariable Long id) {
 
@@ -54,31 +57,52 @@ public class AppointmentController {
         );
     }
 
-
+    @PreAuthorize("hasRole('PATIENT')")
     @PostMapping("/book")
-    public ResponseEntity<?> book(@RequestBody AppointmentRequestDTO dto) {
-        appointmentService.bookAppointment(dto);
+    public ResponseEntity<?> book(@RequestBody AppointmentRequestDTO dto,
+                                  Authentication authentication) {
+
+        String email = authentication.getName();
+
+        appointmentService.bookAppointment(dto, email);
+
         return ResponseEntity.ok().body(
                 new ApiResponse<>("Appointment booked successfully", null)
         );
     }
 
 
+    @PreAuthorize("hasRole('PATIENT')")
     @PatchMapping("/{id}/reschedule")
     public ResponseEntity<?> reschedule(@PathVariable Long id,
-                                        @RequestBody AppointmentRequestDTO dto) {
-        appointmentService.rescheduleAppointment(id, dto.getAppointmentDate(), dto.getAppointmentTime());
+                                        @RequestBody AppointmentRequestDTO dto,
+                                        Authentication authentication) {
+
+        String email = authentication.getName();
+
+        appointmentService.rescheduleAppointment(
+                id,
+                dto.getAppointmentDate(),
+                dto.getAppointmentTime(),
+                email
+        );
+
         return ResponseEntity.ok().body(
                 new ApiResponse<>("Appointment rescheduled successfully", id)
         );
     }
 
 
+    @PreAuthorize("hasRole('PATIENT')")
     @PatchMapping("/{id}/patient-cancel")
     public ResponseEntity<?> patientCancel(@PathVariable Long id,
-                                           @RequestBody CancelRequest request) {
+                                           @RequestBody CancelRequest request,
+                                           Authentication authentication) {
 
-        appointmentService.patientCancelAppointment(id, request.getPatientId(), request.getReason());
+        String email = authentication.getName();
+
+        appointmentService.patientCancelAppointment(id, email, request.getCancelReason());
+
         return ResponseEntity.ok().body(
                 new ApiResponse<>("Your appointment has been cancelled", id)
         );

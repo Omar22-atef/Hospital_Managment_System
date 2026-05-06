@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CancelRequest {
-    private String reason;
-    private Long patientId ;
+    private String cancelReason;
 }
