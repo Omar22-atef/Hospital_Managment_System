@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🏥 HMS Care
+        </div>
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero fade-in">
+        <div class="hero-content">
+            <h1>Your Health is Our Top Priority</h1>
+            <p>Experience world-class healthcare with our modern facilities and expert medical professionals. We are dedicated to providing the best care for you and your family.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="handleBookAppointment()">Book Appointment</button>
+                <a href="register.html" class="btn btn-outline">Join Us</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <!-- Using a placeholder image for demo purposes -->
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital Care">
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section fade-in">
+        <h2 class="section-title">Our Services</h2>
+        <div class="services-grid">
+            <div class="card service-card">
+                <div class="service-icon">👨‍⚕️</div>
+                <h3>Expert Doctors</h3>
+                <p>Consult with highly qualified and experienced specialists for accurate diagnosis and treatment.</p>
+            </div>
+            <div class="card service-card">
+                <div class="service-icon">🚑</div>
+                <h3>24/7 Emergency</h3>
+                <p>Round-the-clock emergency services to handle any medical critical situations with utmost priority.</p>
+            </div>
+            <div class="card service-card">
+                <div class="service-icon">🔬</div>
+                <h3>Modern Lab</h3>
+                <p>Fully equipped laboratories ensuring precise tests and quick delivery of health reports.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section fade-in" style="background-color: var(--white); padding-top: 4rem; padding-bottom: 4rem; border-radius: var(--border-radius); box-shadow: var(--shadow);">
+        <h2 class="section-title">About Us</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto; color: var(--text-light); font-size: 1.1rem;">
+            HMS Care is a leading healthcare provider committed to delivering comprehensive medical services. 
+            Our modern infrastructure, coupled with advanced technology and a compassionate team, ensures that every patient receives personalized and top-tier care.
+            Our hospital management system integrates all departments to provide a seamless and efficient experience from appointment booking to recovery.
+        </p>
+    </section>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script>
+        // Check token and redirect logic for Book Appointment button
+        function handleBookAppointment() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // If no token -> redirect to login.html
+                window.location.href = 'login.html';
+            } else {
+                // ELSE -> go to book-appointment.html
+                window.location.href = 'book-appointment.html';
+            }
+        }
+    </script>
+</body>
+</html>

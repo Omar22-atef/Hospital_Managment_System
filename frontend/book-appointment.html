@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🏥 HMS Care
+        </div>
+        <div class="navbar-links">
+            <!-- Populated by ui.js -->
+        </div>
+    </nav>
+
+    <!-- Book Appointment Section -->
+    <div class="login-container fade-in">
+        <div class="card login-card" style="max-width: 500px;">
+            <div class="login-header">
+                <h2>Book an Appointment</h2>
+                <p style="color: var(--text-light);">Schedule a visit with our expert doctors</p>
+            </div>
+            
+            <form id="bookAppointmentForm">
+                <div class="form-group">
+                    <label class="form-label" for="doctorId">Select Doctor</label>
+                    <select id="doctorId" class="form-control" required style="cursor: pointer; background-color: #fff;">
+                        <option value="" disabled selected>-- Choose a Doctor --</option>
+                        <option value="1">Dr. John Smith (Cardiology)</option>
+                        <option value="2">Dr. Sarah Johnson (Pediatrics)</option>
+                        <option value="3">Dr. Michael Brown (Neurology)</option>
+                        <option value="4">Dr. Emily Davis (General Practice)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="appointmentDate">Appointment Date</label>
+                    <input type="date" id="appointmentDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="time">Preferred Time</label>
+                    <input type="time" id="time" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Confirm Booking</button>
+                <a href="patient-dashboard.html" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem; display: block;">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/appointments.js"></script>
+
+    <script>
+        // Require Authentication
+        requireAuth();
+
+        // Prevent setting past dates
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+
+        document.getElementById('bookAppointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const doctorId = document.getElementById('doctorId').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const time = document.getElementById('time').value;
+
+            if (!doctorId || !appointmentDate || !time) {
+                showToast("Please fill in all details.", "error");
+                return;
+            }
+
+            try {
+                // The backend API might expect `date` instead of `appointmentDate` depending on the entity mapping, 
+                // but we will send both to be safe or what was conventionally used.
+                await bookAppointment({ doctorId, appointmentDate, date: appointmentDate, time });
+                
+                showToast("Appointment booked successfully!", "success");
+
+                // Redirect to dashboard after short delay
+                setTimeout(() => {
+                    const role = localStorage.getItem('role');
+                    if (role && role.toUpperCase() === 'PATIENT') {
+                        window.location.href = 'patient-dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                showToast(error.message || "Failed to book appointment", "error");
+            }
+        });
+    </script>
+</body>
+</html>

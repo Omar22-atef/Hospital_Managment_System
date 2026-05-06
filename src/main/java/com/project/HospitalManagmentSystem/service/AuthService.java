@@ -29,7 +29,6 @@ public class AuthService implements IAuthService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final OtpTokenRepository otpTokenRepository;
-    // ✅ REMOVED: PasswordResetTokenRepository (was never used)
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
@@ -37,9 +36,6 @@ public class AuthService implements IAuthService {
     @Override
     public void register(RegisterRequestDTO request) {
 
-        // ✅ Only PATIENT can self-register
-        // DOCTOR is added by Admin via /api/admin/doctors
-        // ADMIN cannot be registered from outside
         if (request.getRole() != UserRole.PATIENT) {
             throw new RuntimeException("Only patients can register. Doctors are added by the Admin.");
         }
@@ -60,50 +56,66 @@ public class AuthService implements IAuthService {
     public LoginResponseDTO login(LoginRequestDTO request) {
         String email = request.getEmail();
         String password = request.getPassword();
-        UserRole role = request.getRole();
 
-        String encodedPassword = null;
-        String name = null;
-        String token = null;
+        String token;
+        String name;
+        UserRole role;
 
-        if (role == UserRole.ADMIN) {
-            Admin admin = adminRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Admin not found"));
-            encodedPassword = admin.getPassword();
-            name = admin.getName();
-            if (!passwordEncoder.matches(password, encodedPassword)) {
+        var adminOpt = adminRepository.findByEmail(email);
+        if (adminOpt.isPresent()) {
+            Admin admin = adminOpt.get();
+
+            if (!passwordEncoder.matches(password, admin.getPassword())) {
                 throw new RuntimeException("Invalid password");
             }
+
+            role = UserRole.ADMIN;
+            name = admin.getName();
             token = jwtUtil.generateToken(email, role.name());
+
             admin.setToken(token);
             adminRepository.save(admin);
 
-        } else if (role == UserRole.DOCTOR) {
-            Doctor doctor = doctorRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
-            encodedPassword = doctor.getPassword();
-            name = doctor.getName();
-            if (!passwordEncoder.matches(password, encodedPassword)) {
+            return new LoginResponseDTO(token, role.name(), name, email);
+        }
+
+        var doctorOpt = doctorRepository.findByEmail(email);
+        if (doctorOpt.isPresent()) {
+            Doctor doctor = doctorOpt.get();
+
+            if (!passwordEncoder.matches(password, doctor.getPassword())) {
                 throw new RuntimeException("Invalid password");
             }
+
+            role = UserRole.DOCTOR;
+            name = doctor.getName();
             token = jwtUtil.generateToken(email, role.name());
+
             doctor.setToken(token);
             doctorRepository.save(doctor);
 
-        } else if (role == UserRole.PATIENT) {
-            Patient patient = patientRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Patient not found"));
-            encodedPassword = patient.getPassword();
-            name = patient.getName();
-            if (!passwordEncoder.matches(password, encodedPassword)) {
-                throw new RuntimeException("Invalid password");
-            }
-            token = jwtUtil.generateToken(email, role.name());
-            patient.setToken(token);
-            patientRepository.save(patient);
+            return new LoginResponseDTO(token, role.name(), name, email);
         }
 
-        return new LoginResponseDTO(token, role.name(), name, email);
+        var patientOpt = patientRepository.findByEmail(email);
+        if (patientOpt.isPresent()) {
+            Patient patient = patientOpt.get();
+
+            if (!passwordEncoder.matches(password, patient.getPassword())) {
+                throw new RuntimeException("Invalid password");
+            }
+
+            role = UserRole.PATIENT;
+            name = patient.getName();
+            token = jwtUtil.generateToken(email, role.name());
+
+            patient.setToken(token);
+            patientRepository.save(patient);
+
+            return new LoginResponseDTO(token, role.name(), name, email);
+        }
+
+        throw new RuntimeException("User not found");
     }
 
     @Override

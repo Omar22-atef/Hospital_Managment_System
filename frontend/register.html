@@ -1,81 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: "#0057cd",
-        bg: "#f8f9fa",
-        border: "#e1e3e4",
-        text: "#191c1d",
-        muted: "#424655"
-      }
-    }
-  }
-}
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+<body>
 
-<body class="bg-bg text-text font-[Inter] flex items-center justify-center min-h-screen">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🏥 HMS Care
+        </div>
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html" style="color: var(--primary-color);">Register</a>
+        </div>
+    </nav>
 
-<main class="w-full max-w-lg bg-white p-8 rounded-xl shadow border">
+    <!-- Register Section -->
+    <div class="login-container fade-in">
+        <div class="card login-card" style="max-width: 500px;">
+            <div class="login-header">
+                <h2>Create an Account</h2>
+                <p style="color: var(--text-light);">Join us to book appointments and manage your health</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
 
-  <!-- HEADER -->
-  <div class="text-center mb-6">
-    <span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
-    <h1 class="text-xl font-bold text-primary">MedCore Systems</h1>
-    <p class="text-sm text-muted mt-2">Create your account</p>
-  </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john.doe@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="+1234567890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" class="form-control" required>
+                </div>
 
-  <!-- FORM -->
-  <form class="space-y-4 text-sm">
-
-    <input type="text" placeholder="Full Name"
-      class="w-full border p-2 rounded">
-
-    <input type="email" placeholder="Email"
-      class="w-full border p-2 rounded">
-
-    <input type="tel" placeholder="Phone"
-      class="w-full border p-2 rounded">
-
-    <div class="grid grid-cols-2 gap-3">
-      <input type="password" placeholder="Password"
-        class="border p-2 rounded">
-      <input type="password" placeholder="Confirm"
-        class="border p-2 rounded">
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Register</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
+                Already have an account? <a href="login.html" style="font-weight: 600;">Login here</a>
+            </div>
+        </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <input type="checkbox">
-      <span class="text-muted text-xs">Accept terms</span>
-    </div>
-
-    <button class="w-full bg-primary text-white py-2 rounded">
-      Register
-    </button>
-
-  </form>
-
-  <!-- FOOTER -->
-  <p class="text-center text-sm text-muted mt-4">
-    Already have an account?
-    <a class="text-primary">Login</a>
-  </p>
-
-</main>
-
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

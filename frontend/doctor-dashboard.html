@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-approved { background-color: #d4edda; color: #155724; }
+        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+        .btn-approve {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-approve:hover { background-color: #27ae60; transform: scale(1.05); }
+        .btn-reject {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-reject:hover { background-color: #c0392b; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🏥 HMS Care - Doctor Portal
+        </div>
+        <div class="navbar-links">
+            <!-- Populated by ui.js -->
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="section fade-in">
+        <div class="dashboard-header">
+            <h2>Welcome, Doctor!</h2>
+        </div>
+
+        <div class="card">
+            <h3>My Appointments</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Loading appointments...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/appointments.js"></script>
+    
+    <script>
+        // Require Authentication
+        requireAuth();
+
+        async function handleStatusUpdate(id, newStatus) {
+            try {
+                await updateAppointmentStatus(id, newStatus);
+                showToast(`Appointment ${newStatus.toLowerCase()} successfully`, "success");
+                loadAppointments(); // Reload list
+            } catch (error) {
+                showToast(error.message || `Failed to ${newStatus} appointment`, "error");
+            }
+        }
+
+        async function loadAppointments() {
+            const tbody = document.getElementById('appointmentsBody');
+            try {
+                const appointments = await getAppointments();
+                
+                if (!appointments || appointments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No appointments found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                appointments.forEach(app => {
+                    let statusClass = 'status-pending';
+                    const status = (app.status || 'PENDING').toUpperCase();
+                    if (status === 'APPROVED' || status === 'CONFIRMED') statusClass = 'status-approved';
+                    else if (status === 'REJECTED' || status === 'CANCELLED') statusClass = 'status-rejected';
+
+                    const actionsHtml = status === 'PENDING' ? `
+                        <button class="action-btn btn-approve" onclick="handleStatusUpdate(${app.id}, 'APPROVED')">Approve</button>
+                        <button class="action-btn btn-reject" onclick="handleStatusUpdate(${app.id}, 'REJECTED')">Reject</button>
+                    ` : `<span style="color: #888; font-size: 0.9rem;">No actions</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${app.id || '-'}</td>
+                        <td>${app.patientName || app.patientEmail || 'Patient'}</td>
+                        <td>${app.appointmentDate || app.date || '-'}</td>
+                        <td>${app.time || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td>${actionsHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load appointments: ${error.message}</td></tr>`;
+                showToast("Failed to load appointments", "error");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAppointments);
+    </script>
+</body>
+</html>

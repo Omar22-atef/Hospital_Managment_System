@@ -30,8 +30,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+
+                .cors(cors -> {})
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -43,14 +47,20 @@ public class SecurityConfig {
                             new ObjectMapper().writeValue(response.getOutputStream(), body);
                         })
                 )
+
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/api/patient/**").hasRole("PATIENT")
+                        .requestMatchers("/api/appointments/**").authenticated()
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
