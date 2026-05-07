@@ -28,7 +28,7 @@ public class DataInitializer {
         if (adminRepository.count() == 0) {
             Admin admin = Admin.builder()
                     .name("Super Admin")
-                    .email("ahmedessam66777@gmail.com")
+                    .email("")
                     .password(passwordEncoder.encode("123456"))
                     .build();
 
