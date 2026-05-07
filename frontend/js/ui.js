@@ -36,6 +36,8 @@ function updateNavbar() {
     if (token) {
         // User is logged in
         navbarLinksContainer.innerHTML = `
+            <a href="index.html">Home</a>
+            <a href="available-doctors.html">Our Doctors</a>
             <a href="${dashboardLink}">Dashboard</a>
             <a href="#" onclick="logout(); return false;" style="color: var(--primary-color);">Logout</a>
         `;
@@ -43,6 +45,7 @@ function updateNavbar() {
         // User is NOT logged in
         navbarLinksContainer.innerHTML = `
             <a href="index.html">Home</a>
+            <a href="available-doctors.html">Our Doctors</a>
             <a href="login.html">Login</a>
             <a href="register.html">Register</a>
         `;
@@ -89,4 +92,35 @@ function showToast(message, type = 'info') {
             }
         }, 300); // Wait for transition to finish
     }, 3000);
+}
+
+/**
+ * Validates a Date of Birth (must be 16-120 years old, no future dates).
+ * Returns true if valid, or a string error message if invalid.
+ * @param {string} dobString - The date string (YYYY-MM-DD)
+ */
+function validateDateOfBirth(dobString) {
+    if (!dobString) return "Date of Birth is required.";
+    const dob = new Date(dobString);
+    const today = new Date();
+    
+    if (dob > today) {
+        return "Date of birth cannot be in the future.";
+    }
+    
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    
+    if (age < 16) {
+        return "You must be at least 16 years old to use the system.";
+    }
+    
+    if (age > 120) {
+        return "Please enter a valid date of birth.";
+    }
+    
+    return true;
 }

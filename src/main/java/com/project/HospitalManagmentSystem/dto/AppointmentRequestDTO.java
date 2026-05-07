@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @Builder
@@ -18,6 +19,7 @@ public class AppointmentRequestDTO {
     @NotNull(message = "Appointment Date is required")
     private LocalDate appointmentDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @NotNull(message = "Appointment Time is required")
     private LocalTime appointmentTime;
 

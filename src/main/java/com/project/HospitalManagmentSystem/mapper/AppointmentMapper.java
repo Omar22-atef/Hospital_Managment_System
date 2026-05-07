@@ -30,6 +30,8 @@ public interface AppointmentMapper {
                 .patientId(entity.getPatient().getId())
                 .doctorId(entity.getDoctor().getId())
                 .doctorName(entity.getDoctor().getName())
+                .patientName(entity.getPatient().getName())
+                .consultationFee(entity.getDoctor().getConsultationFee())
                 .build();
     }
 }

@@ -37,9 +37,10 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-approved { background-color: #d4edda; color: #155724; }
-        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        .status-pending   { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .status-completed { background-color: #cce5ff; color: #004085; }
     </style>
 </head>
 <body>
@@ -47,7 +48,7 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-brand">
-            🏥 HMS Care
+            MediCore
         </div>
         <div class="navbar-links">
             <!-- Populated by ui.js -->
@@ -57,8 +58,14 @@
     <!-- Dashboard Content -->
     <div class="section fade-in">
         <div class="dashboard-header">
-            <h2>Welcome, Patient!</h2>
-            <a href="book-appointment.html" class="btn btn-primary">Book Appointment</a>
+            <h2 id="welcomeText">Welcome, Patient!</h2>
+            <div>
+                <a href="available-doctors.html"  class="btn btn-outline" style="margin-right: 0.5rem;">View Doctors</a>
+                <a href="patient-profile.html"    class="btn btn-outline" style="margin-right: 0.5rem;">My Profile</a>
+                <a href="patient-appointments.html" class="btn btn-outline" style="margin-right: 0.5rem;">My Appointments</a>
+                <a href="patient-payments.html"   class="btn btn-outline" style="margin-right: 0.5rem;">My Payments</a>
+                <a href="book-appointment.html"   class="btn btn-primary">Book Appointment</a>
+            </div>
         </div>
 
         <div class="card">
@@ -96,6 +103,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
 
+            loadPatientProfile();
             const tbody = document.getElementById('appointmentsBody');
 
             try {
@@ -119,36 +127,21 @@
 
                 appointments.forEach(app => {
 
-                    // Status Style
-                    let statusClass = 'status-pending';
-
+                    // AppointmentStatus enum: PENDING, CONFIRMED, CANCELLED, COMPLETED
                     const status = (app.status || 'PENDING').toUpperCase();
-
-                    if (status === 'APPROVED' || status === 'CONFIRMED') {
-                        statusClass = 'status-approved';
-                    }
-                    else if (status === 'REJECTED' || status === 'CANCELLED') {
-                        statusClass = 'status-rejected';
-                    }
+                    let statusClass = 'status-pending';
+                    if (status === 'CONFIRMED') statusClass = 'status-confirmed';
+                    else if (status === 'CANCELLED') statusClass = 'status-cancelled';
+                    else if (status === 'COMPLETED') statusClass = 'status-completed';
 
                     // Doctor Name
-                    const doctorName =
-                        app.doctorName ||
-                        app.doctor?.name ||
-                        app.doctor?.fullName ||
-                        '-';
+                    const doctorName = app.doctorName || '-';
 
                     // Date
-                    const appointmentDate =
-                        app.appointmentDate ||
-                        app.date ||
-                        '-';
+                    const appointmentDate = app.appointmentDate || '-';
 
                     // Time
-                    const appointmentTime =
-                        app.appointmentTime ||
-                        app.time ||
-                        '-';
+                    const appointmentTime = app.appointmentTime || '-';
 
                     const tr = document.createElement('tr');
 
@@ -192,6 +185,29 @@
                 showToast("Failed to load appointments", "error");
             }
         });
+
+        async function loadPatientProfile() {
+
+            try {
+
+                const response = await apiFetch('/api/patient/me');
+
+                console.log("PATIENT RESPONSE:", response);
+
+                // Supports wrapped ApiResponse or direct object
+                const patient = response.data ? response.data : response;
+
+                document.getElementById('welcomeText').textContent =
+                    `Welcome, ${patient.name || 'Patient'}!`;
+
+            } catch (error) {
+
+                console.error('Failed to load patient profile', error);
+
+                document.getElementById('welcomeText').textContent =
+                    'Welcome, Patient!';
+            }
+        }
     </script>
 </body>
 </html>

@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @Builder
@@ -19,8 +21,11 @@ public class DoctorResponseDTO {
     private String phone;
     private String email;
     private String specialization;
+    private BigDecimal consultationFee;
     private DaysOfWeek dayOfWeek;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime startTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime endTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

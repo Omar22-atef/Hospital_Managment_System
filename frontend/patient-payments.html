@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payments - Hospital Management System</title>
+    <meta name="description" content="View your payment history and pay for completed appointments.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stripe.js v3 — must load from Stripe's CDN for PCI compliance -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: var(--background-color); }
+
+        /* PaymentStatus enum: PENDING, PAID, FAILED, REFUNDED */
+        .pay-badge    { padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem; font-weight: 500; }
+        .pay-pending  { background-color: #fff3cd; color: #856404; }
+        .pay-paid     { background-color: #d4edda; color: #155724; }
+        .pay-failed   { background-color: #f8d7da; color: #721c24; }
+        .pay-refunded { background-color: #cce5ff; color: #004085; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .summary-card { background: var(--white); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; text-align: center; }
+        .summary-card h3 { font-size: 1.75rem; color: var(--primary-color); margin: 0 0 0.25rem; }
+        .summary-card p  { margin: 0; color: var(--text-light); font-size: 0.9rem; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; border-radius: var(--border-radius); padding: 2rem; width: 90%; max-width: 460px; position: relative; box-shadow: 0 8px 30px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #aaa; }
+        .modal-close:hover { color: #333; }
+
+        .pay-info-row { display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.92rem; }
+        .fee-display {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+        .fee-display .fee-label { font-size: 0.85rem; color: #006064; margin: 0 0 0.25rem; }
+        .fee-display .fee-amount { font-size: 2rem; font-weight: 700; color: #00838f; margin: 0; }
+
+        /* Stripe card element container */
+        #card-element {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 0.85rem 1rem;
+            background: #fff;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        #card-element.StripeElement--focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,150,136,0.15); }
+        #card-element.StripeElement--invalid { border-color: #e74c3c; }
+
+        #card-error { color: #e74c3c; font-size: 0.85rem; margin-top: 0.4rem; min-height: 1rem; }
+
+        .action-btn { padding: 0.35rem 0.75rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: var(--transition); background-color: #27ae60; color: white; }
+        .action-btn:hover { background-color: #229954; transform: scale(1.05); }
+
+        .method-tabs { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+        .method-tab { flex: 1; padding: 0.65rem; border: 2px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem; text-align: center; transition: all 0.2s; }
+        .method-tab.active { border-color: var(--primary-color); background: #e0f7fa; color: var(--primary-color); }
+        .method-tab:hover:not(.active) { border-color: #aaa; }
+
+        hr.divider { border: none; border-top: 1px solid #eee; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">MediCore - Patient Portal</div>
+        <div class="navbar-links"><!-- Populated by ui.js --></div>
+    </nav>
+
+    <div class="section fade-in">
+        <div class="dashboard-header">
+            <h2>My Payments</h2>
+            <a href="patient-dashboard.html" class="btn btn-outline">Back to Dashboard</a>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-grid" id="summaryGrid">
+            <div class="summary-card"><h3>…</h3><p>Loading</p></div>
+        </div>
+
+        <!-- Payment history -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3>Payment History</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Appointment</th><th>Amount (USD)</th><th>Method</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="paymentsBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Appointments awaiting payment -->
+        <div class="card">
+            <h3>Appointments — Pay Now</h3>
+            <p style="color:var(--text-light);font-size:0.9rem;">
+                Appointments that haven't been paid yet appear here.
+                The consultation fee is set by your doctor.
+            </p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Appt #</th><th>Doctor</th><th>Date</th><th>Fee (USD)</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="unpaidBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Payment Modal ─────────────────────────────────────────────── -->
+    <div class="modal-overlay" id="payModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closePayModal()">&times;</button>
+            <h3 style="margin-top:0;">Pay for Appointment</h3>
+
+            <!-- Appointment info -->
+            <div id="paymentDetails"></div>
+
+            <!-- Fee display (read-only — from backend) -->
+            <div class="fee-display" id="feeDisplay">
+                <p class="fee-label">Consultation Fee</p>
+                <p class="fee-amount" id="feeAmount">$0.00</p>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Payment method tabs -->
+            <div class="method-tabs">
+                <button type="button" class="method-tab active" id="tabCash" onclick="selectMethod('CASH')">
+                    💵 Cash
+                </button>
+                <button type="button" class="method-tab" id="tabCard" onclick="selectMethod('CREDIT_CARD')">
+                    💳 Credit Card
+                </button>
+            </div>
+
+            <form id="paymentForm" onsubmit="submitPayment(event)">
+                <input type="hidden" id="payAppointmentId">
+                <input type="hidden" id="payMethod" value="CASH">
+
+                <!-- Cash info -->
+                <div id="cashInfo" style="background:#f0f9f0;border-radius:8px;padding:0.85rem 1rem;font-size:0.9rem;color:#2e7d32;margin-bottom:0.75rem;">
+                    <strong>Cash payment</strong> — please pay the consultation fee at the reception desk.
+                    Clicking Submit will record your payment intent.
+                </div>
+
+                <!-- Stripe credit card fields (hidden until CREDIT_CARD selected) -->
+                <div id="cardGroup" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">Card Details <span style="color:red;">*</span></label>
+                        <!-- Stripe Elements mounts a secure iframe here -->
+                        <div id="card-element"></div>
+                        <p id="card-error"></p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="paySubmitBtn"
+                        style="width:100%;margin-top:0.75rem;background:#27ae60;border-color:#27ae60;">
+                    Submit Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/patient.js"></script>
+    <script src="js/appointments.js"></script>
+
+    <script>
+        requireAuth();
+
+        // Stripe publishable key (safe to be public)
+        const STRIPE_PK = 'pk_test_51TSiJ0Q5CVl6R8ElhucU5jkPHvZpVOzt173eEX1gGVcc2CLAvUr3cnjtPFx1UWz8QaLthR7NXFpUZOHzmDJZgk9w004HkrymZ1';
+        const stripe   = Stripe(STRIPE_PK);
+        const elements = stripe.elements();
+
+        // Mount the Stripe card element (lazy — mounted when modal opens)
+        let cardElement    = null;
+        let cardMounted    = false;
+        let paidAppointmentIds = new Set();
+
+        function mountCard() {
+            if (cardMounted) return;
+            cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '16px',
+                        color: '#2d3748',
+                        '::placeholder': { color: '#a0aec0' }
+                    },
+                    invalid: { color: '#e74c3c' }
+                }
+            });
+            cardElement.mount('#card-element');
+            cardElement.on('change', function(event) {
+                document.getElementById('card-error').textContent = event.error ? event.error.message : '';
+            });
+            cardMounted = true;
+        }
+
+        // ── Method selection ──────────────────────────────────────────
+        function selectMethod(method) {
+            document.getElementById('payMethod').value = method;
+            document.getElementById('tabCash').classList.toggle('active', method === 'CASH');
+            document.getElementById('tabCard').classList.toggle('active', method === 'CREDIT_CARD');
+            document.getElementById('cashInfo').style.display  = method === 'CASH'        ? 'block' : 'none';
+            document.getElementById('cardGroup').style.display = method === 'CREDIT_CARD' ? 'block' : 'none';
+            if (method === 'CREDIT_CARD') mountCard();
+        }
+
+        // ── Load data on page load ────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Must load payments FIRST so paidAppointmentIds is populated
+            await loadPayments();
+            await loadUnpaid();
+        });
+
+        // ── Payment history ───────────────────────────────────────────
+        async function loadPayments() {
+            const tbody = document.getElementById('paymentsBody');
+            const grid  = document.getElementById('summaryGrid');
+            try {
+                // GET /api/patient/payments → List<PaymentResponseDTO>
+                const payments = await getPatientPayments();
+
+                if (payments) {
+                    payments.forEach(p => { if (p.appointmentId) paidAppointmentIds.add(Number(p.appointmentId)); });
+                }
+
+                if (!payments || payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No payment records yet.</td></tr>';
+                    grid.innerHTML  = summaryCards(0, 0, '0.00');
+                    return;
+                }
+
+                const total  = payments.length;
+                const paid   = payments.filter(p => (p.paymentStatus || '').toUpperCase() === 'PAID').length;
+                const amtSum = payments
+                    .filter(p => (p.paymentStatus || '').toUpperCase() === 'PAID')
+                    .reduce((s, p) => s + parseFloat(p.amount || 0), 0).toFixed(2);
+
+                grid.innerHTML  = summaryCards(total, paid, amtSum);
+                tbody.innerHTML = '';
+                payments.forEach(p => {
+                    const status = (p.paymentStatus || 'PENDING').toUpperCase();
+                    let cls = 'pay-pending';
+                    if (status === 'PAID') cls = 'pay-paid';
+                    else if (status === 'FAILED')   cls = 'pay-failed';
+                    else if (status === 'REFUNDED') cls = 'pay-refunded';
+                    const method = (p.paymentMethod || '-').replace('_', ' ');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>#' + (p.id || '-') + '</td>' +
+                        '<td>Appt #' + (p.appointmentId || '-') + '</td>' +
+                        '<td>$' + (p.amount != null ? parseFloat(p.amount).toFixed(2) : '-') + '</td>' +
+                        '<td>' + method + '</td>' +
+                        '<td><span class="pay-badge ' + cls + '">' + status + '</span></td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Failed: ' + err.message + '</td></tr>';
+                grid.innerHTML  = '<div class="summary-card" style="grid-column:1/-1"><p style="color:red;">' + err.message + '</p></div>';
+                showToast('Failed to load payment history', 'error');
+            }
+        }
+
+        function summaryCards(total, paid, amtSum) {
+            return '<div class="summary-card"><h3>' + total + '</h3><p>Total Transactions</p></div>' +
+                   '<div class="summary-card"><h3>' + paid  + '</h3><p>Paid</p></div>' +
+                   '<div class="summary-card"><h3>$' + amtSum + '</h3><p>Total Paid (USD)</p></div>';
+        }
+
+        // ── Unpaid appointments ─────────────────────────────
+        async function loadUnpaid() {
+            const tbody = document.getElementById('unpaidBody');
+            try {
+                // GET /api/patient/appointments → List<AppointmentResponseDTO>
+                // DTO now includes consultationFee from doctor
+                const appts = await getPatientAppointments();
+                const unpaid = (appts || []).filter(a =>
+                    (a.status || '').toUpperCase() !== 'CANCELLED' &&
+                    !paidAppointmentIds.has(Number(a.id))
+                );
+
+                if (unpaid.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-light);">No appointments awaiting payment.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                unpaid.forEach(app => {
+                    const fee = app.consultationFee != null
+                        ? '$' + parseFloat(app.consultationFee).toFixed(2)
+                        : '<em style="color:#888;">Not set</em>';
+                    const canPay = app.consultationFee != null && parseFloat(app.consultationFee) > 0;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>#' + app.id + '</td>' +
+                        '<td>' + (app.doctorName || 'Doctor') + '</td>' +
+                        '<td>' + (app.appointmentDate || '-') + '</td>' +
+                        '<td><strong>' + fee + '</strong></td>' +
+                        '<td>' + (canPay
+                            ? '<button class="action-btn" onclick=\'openPayModal(' +
+                              JSON.stringify(app.id) + ',' +
+                              JSON.stringify(app.doctorName || 'Doctor') + ',' +
+                              JSON.stringify(app.appointmentDate || '') + ',' +
+                              JSON.stringify(app.consultationFee) +
+                              ')\'>Pay Now</button>'
+                            : '<span style="color:#e74c3c;font-size:0.85rem;">Fee not set</span>') + '</td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Failed: ' + err.message + '</td></tr>';
+            }
+        }
+
+        // ── Payment modal ─────────────────────────────────────────────
+        function openPayModal(appointmentId, doctorName, apptDate, consultationFee) {
+            document.getElementById('payAppointmentId').value = appointmentId;
+            document.getElementById('feeAmount').textContent = '$' + parseFloat(consultationFee).toFixed(2);
+            document.getElementById('card-error').textContent = '';
+            document.getElementById('paymentDetails').innerHTML =
+                '<div class="pay-info-row"><span>Appointment #</span><strong>' + appointmentId + '</strong></div>' +
+                '<div class="pay-info-row"><span>Doctor</span><strong>' + doctorName + '</strong></div>' +
+                '<div class="pay-info-row"><span>Date</span><strong>' + apptDate + '</strong></div>';
+
+            // Reset to CASH tab
+            selectMethod('CASH');
+            document.getElementById('payModal').classList.add('active');
+        }
+
+        function closePayModal() {
+            document.getElementById('payModal').classList.remove('active');
+        }
+
+        // ── Submit payment ────────────────────────────────────────────
+        async function submitPayment(e) {
+            e.preventDefault();
+
+            const appointmentId = document.getElementById('payAppointmentId').value;
+            const paymentMethod = document.getElementById('payMethod').value;
+
+            const btn  = document.getElementById('paySubmitBtn');
+            const orig = btn.textContent;
+            btn.textContent = 'Processing...';
+            btn.disabled    = true;
+
+            try {
+                // Build PaymentRequestDTO — amount is NOT sent (backend derives from consultationFee)
+                // POST /api/payments
+                // Body: { paymentMethod (CASH|CREDIT_CARD), appointmentId, stripeToken? }
+                const payload = {
+                    paymentMethod: paymentMethod,
+                    appointmentId: Number(appointmentId)
+                };
+
+                if (paymentMethod === 'CREDIT_CARD') {
+                    // Use Stripe.js to tokenise the card — never touches our server
+                    const { token, error } = await stripe.createToken(cardElement);
+                    if (error) {
+                        document.getElementById('card-error').textContent = error.message;
+                        btn.textContent = orig;
+                        btn.disabled    = false;
+                        return;
+                    }
+                    payload.stripeToken = token.id;
+                }
+
+                await processPayment(payload);
+                showToast('Payment submitted successfully!', 'success');
+                closePayModal();
+                paidAppointmentIds.add(Number(appointmentId));
+                await loadPayments();
+                await loadUnpaid();
+
+            } catch (err) {
+                showToast(err.message || 'Payment failed', 'error');
+            } finally {
+                btn.textContent = orig;
+                btn.disabled    = false;
+            }
+        }
+    </script>
+</body>
+</html>

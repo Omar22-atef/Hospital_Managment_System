@@ -1,9 +1,12 @@
 package com.project.HospitalManagmentSystem.controller;
 
+import com.project.HospitalManagmentSystem.entity.Admin;
+import com.project.HospitalManagmentSystem.repository.AdminRepository;
 import com.project.HospitalManagmentSystem.service.AdminFacadeService;
 import com.project.HospitalManagmentSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
 public class AdminController {
 
     private final AdminFacadeService adminFacade;
+    private final AdminRepository adminRepository;
 
     // GET /api/admin/dashboard
     @GetMapping("/dashboard")
@@ -57,5 +61,22 @@ public class AdminController {
     @GetMapping("/patients")
     public ResponseEntity<ApiResponse<List<PatientResponseDTO>>> getAllPatients() {
         return ResponseEntity.ok(new ApiResponse<>("success", adminFacade.getAllPatients()));
+    }
+
+    @GetMapping("/me")
+    public AdminResponseDTO getAdmin(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        return new AdminResponseDTO(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getCreatedAt(),
+                admin.getUpdatedAt()
+        );
     }
 }

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Doctors - Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+        .btn-edit { background-color: #f39c12; color: white; }
+        .btn-edit:hover { background-color: #d68910; }
+        .btn-delete { background-color: #e74c3c; color: white; }
+        .btn-delete:hover { background-color: #c0392b; }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .close-btn {
+            background: none; border: none; font-size: 1.5rem; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            MediCore - Admin Portal
+        </div>
+        <div class="navbar-links">
+            <!-- Populated by ui.js -->
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="section fade-in">
+        <div class="dashboard-header">
+            <h2>Manage Doctors</h2>
+            <div>
+                <button class="btn btn-primary" onclick="openModal()">+ Add New Doctor</button>
+                <a href="admin-dashboard.html" class="btn btn-outline" style="margin-left: 1rem;">Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Doctors Roster</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Email</th>
+                            <th>Schedule</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctorsBody">
+                        <tr><td colspan="6" style="text-align: center;">Loading doctors...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Modal -->
+    <div class="modal-overlay" id="doctorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Doctor</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="doctorForm">
+                <input type="hidden" id="docId">
+                <div class="form-group">
+                    <label class="form-label" for="name">Doctor Name</label>
+                    <input type="text" id="name" class="form-control" required minlength="3" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone</label>
+                    <input type="text" id="phone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="specialization">Specialization</label>
+                    <input type="text" id="specialization" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="consultationFee">Consultation Fee (USD) <span style="color:red;">*</span></label>
+                    <input type="number" id="consultationFee" class="form-control"
+                           step="0.01" min="0.01" placeholder="e.g. 50.00" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="dayOfWeek">Working Day</label>
+                    <select id="dayOfWeek" class="form-control" required>
+                        <option value="MONDAY">Monday</option>
+                        <option value="TUESDAY">Tuesday</option>
+                        <option value="WEDNESDAY">Wednesday</option>
+                        <option value="THURSDAY">Thursday</option>
+                        <option value="FRIDAY">Friday</option>
+                        <option value="SATURDAY">Saturday</option>
+                        <option value="SUNDAY">Sunday</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="startTime">Start Time</label>
+                        <input type="time" id="startTime" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" for="endTime">End Time</label>
+                        <input type="time" id="endTime" class="form-control" step="1" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Save Doctor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    
+    <script>
+        requireAuth();
+
+        let allDoctors = [];
+
+        async function loadDoctors() {
+            const tbody = document.getElementById('doctorsBody');
+            try {
+                allDoctors = await getAllDoctors();
+                
+                if (!allDoctors || allDoctors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No doctors found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                allDoctors.forEach(doc => {
+                    const day = doc.dayOfWeek ? doc.dayOfWeek.charAt(0) + doc.dayOfWeek.slice(1).toLowerCase() : 'Varies';
+                    const start = doc.startTime ? doc.startTime.substring(0,5) : '--:--';
+                    const end = doc.endTime ? doc.endTime.substring(0,5) : '--:--';
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${doc.id}</td>
+                        <td>Dr. ${doc.name}</td>
+                        <td>${doc.specialization || 'N/A'}</td>
+                        <td>${doc.email}</td>
+                        <td>${day}s, ${start}-${end}</td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editDoc(${doc.id})">Edit</button>
+                            <button class="action-btn btn-delete" onclick="delDoc(${doc.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load doctors: ${error.message}</td></tr>`;
+                showToast("Failed to load doctors", "error");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDoctors);
+
+        function openModal() {
+            document.getElementById('modalTitle').textContent = "Add Doctor";
+            document.getElementById('doctorForm').reset();
+            document.getElementById('docId').value = "";
+            document.getElementById('password').required = true;
+            document.getElementById('passwordGroup').style.display = "block";
+            document.getElementById('doctorModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('doctorModal').classList.remove('active');
+        }
+
+        function editDoc(id) {
+            const doc = allDoctors.find(d => d.id === id);
+            if(!doc) return;
+
+            document.getElementById('modalTitle').textContent = "Edit Doctor";
+            document.getElementById('docId').value = doc.id;
+            document.getElementById('name').value = doc.name;
+            document.getElementById('email').value = doc.email;
+            document.getElementById('phone').value = doc.phone || '';
+            document.getElementById('specialization').value = doc.specialization || '';
+            document.getElementById('consultationFee').value = doc.consultationFee != null ? doc.consultationFee : '';
+            
+            if(doc.dayOfWeek) document.getElementById('dayOfWeek').value = doc.dayOfWeek.toUpperCase();
+            if(doc.startTime) document.getElementById('startTime').value = doc.startTime.length === 5 ? doc.startTime + ":00" : doc.startTime;
+            if(doc.endTime) document.getElementById('endTime').value = doc.endTime.length === 5 ? doc.endTime + ":00" : doc.endTime;
+
+            // Password handling for updates (assuming we must provide it to pass DTO validation, 
+            // though usually it's ignored if blank. But DoctorRequestDTO says @NotBlank for password! 
+            // We'll require them to re-enter a password for now to strictly satisfy backend validation)
+            document.getElementById('password').required = true;
+            document.getElementById('password').value = "";
+            document.getElementById('passwordGroup').style.display = "block";
+            
+            document.getElementById('doctorModal').classList.add('active');
+        }
+
+        async function delDoc(id) {
+            if(!confirm("Are you sure you want to delete this doctor?")) return;
+            try {
+                await deleteDoctor(id);
+                showToast("Doctor deleted successfully", "success");
+                loadDoctors();
+            } catch(e) {
+                showToast(e.message || "Failed to delete doctor", "error");
+            }
+        }
+
+        document.getElementById('doctorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            let st = document.getElementById('startTime').value;
+            let et = document.getElementById('endTime').value;
+            // Append seconds if missing to match LocalTime parsing expectations
+            if(st.length === 5) st += ":00";
+            if(et.length === 5) et += ":00";
+
+            // Exactly matching DoctorRequestDTO
+            const payload = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                phone: document.getElementById('phone').value,
+                specialization: document.getElementById('specialization').value,
+                consultationFee: parseFloat(document.getElementById('consultationFee').value),
+                dayOfWeek: document.getElementById('dayOfWeek').value,
+                startTime: st,
+                endTime: et
+            };
+
+            const id = document.getElementById('docId').value;
+            try {
+                if(id) {
+                    await updateDoctor(id, payload);
+                    showToast("Doctor updated successfully", "success");
+                } else {
+                    await createDoctor(payload);
+                    showToast("Doctor created successfully", "success");
+                }
+                closeModal();
+                loadDoctors();
+            } catch(error) {
+                showToast(error.message || "Failed to save doctor", "error");
+            }
+        });
+    </script>
+</body>
+</html>

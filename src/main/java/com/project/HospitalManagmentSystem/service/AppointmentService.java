@@ -131,6 +131,7 @@ public class AppointmentService {
 
         appointment.setAppointmentDate(date);
         appointment.setAppointmentTime(time);
+        appointmentRepository.save(appointment); // persist changes
     }
 
 
@@ -149,17 +150,21 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    public List<String> getBookedSlots(Long doctorId) {
+    public List<String> getBookedSlots(Long doctorId, LocalDate date) {
 
+        // Return only booked times for THIS doctor on THIS specific date.
+        // Without date filtering, 09:00 Monday would block 09:00 on every other day.
         List<Appointment> appointments =
                 appointmentRepository
-                        .findByDoctorIdAndStatusNot(
+                        .findByDoctorIdAndAppointmentDateAndStatusNot(
                                 doctorId,
+                                date,
                                 AppointmentStatus.CANCELLED
                         );
 
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
         return appointments.stream()
-                .map(a -> a.getAppointmentTime().toString())
+                .map(a -> a.getAppointmentTime().format(formatter))
                 .toList();
     }
 }

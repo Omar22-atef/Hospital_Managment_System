@@ -2,89 +2,639 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Management System</title>
-    <!-- Modern Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HMS Care | Advanced Hospital Management System</title>
+    <!-- Modern Typography & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- GLOBAL VARIABLES & RESET ---------- */
+        :root {
+            --primary-color: #1E88A8;
+            --primary-dark: #0f5e77;
+            --secondary-color: #2BB3C0;
+            --accent-color: #F4A261;
+            --background-color: #f4f7fc;
+            --text-color: #1e2a41;
+            --text-light: #5a6e85;
+            --white: #ffffff;
+            --light-gray: #eef2f8;
+            --shadow-sm: 0 8px 20px rgba(0, 32, 64, 0.06);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
+            --transition: all 0.25s ease-in-out;
+            --border-radius: 20px;
+            --border-radius-card: 24px;
+            --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* animations */
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(32px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* container utility */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3.4rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1.2rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.6rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-header p {
+            font-size: 1.15rem;
+            color: var(--text-light);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* Navbar - elevated & glassmorphic */
+        .navbar {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow-sm);
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            background: none;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .navbar-links a {
+            font-weight: 600;
+            color: var(--text-color);
+            transition: var(--transition);
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .navbar-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Buttons modern */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.8rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 6px 14px rgba(30, 136, 168, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px rgba(30, 136, 168, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 3rem;
+            padding: 3rem 0 4rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            flex: 1.2;
+        }
+
+        .hero-content .badge {
+            background: rgba(30, 136, 168, 0.1);
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin: 1.5rem 0 2rem;
+            max-width: 90%;
+        }
+
+        .hero-image {
+            flex: 1;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.02);
+        }
+
+        /* stats section */
+        .stats-section {
+            background: var(--white);
+            border-radius: 40px;
+            padding: 2rem 1rem;
+            margin: 2rem auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            text-align: center;
+            gap: 2rem;
+        }
+
+        .stat-item h3 {
+            font-size: 2.3rem;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        /* services grid enhanced */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: var(--border-radius-card);
+            padding: 2rem 1.8rem;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            background: linear-gradient(145deg, #eef5fa, white);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60px;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-color);
+        }
+
+        /* departments preview */
+        .dept-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .dept-card {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            transition: 0.2s;
+        }
+
+        .dept-card i {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        /* testimonials */
+        .testimonial-grid {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 2rem;
+            flex: 1;
+            min-width: 260px;
+            box-shadow: var(--shadow-sm);
+            font-style: normal;
+        }
+
+        .testimonial-card i.fa-quote-left {
+            color: var(--primary-color);
+            opacity: 0.5;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* CTA section */
+        .cta-section {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            border-radius: 40px;
+            padding: 3rem;
+            text-align: center;
+            color: white;
+            margin: 3rem 0;
+        }
+
+        .cta-section h3 {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .cta-section .btn-white {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            margin-top: 1.2rem;
+        }
+
+        /* footer professional */
+        .footer {
+            background: #0b2b38;
+            color: #cbd5e1;
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+            border-radius: 40px 40px 0 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-col p, .footer-col a {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            transition: 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            font-size: 0.85rem;
+        }
+
+        /* toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .toast {
+            background: white;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-weight: 500;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left: 5px solid #e74c3c; }
+        .toast.success { border-left: 5px solid #2ecc71; }
+        .toast.info { border-left: 5px solid var(--primary-color); }
+
+        @media (max-width: 860px) {
+            .hero { flex-direction: column; text-align: center; }
+            .hero-content p { max-width: 100%; }
+            .navbar { flex-direction: column; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            🏥 HMS Care
-        </div>
-        <div class="navbar-links">
-            <a href="index.html">Home</a>
-            <a href="login.html">Login</a>
-            <a href="register.html">Register</a>
-        </div>
-    </nav>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <i class="fas fa-hospital-user"></i> MediCore
+    </div>
+    <div class="navbar-links">
+        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+        <a href="#services">Services</a>
+        <a href="#departments">Departments</a>
+        <a href="#contact">Contact</a>
+        <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn btn-outline" style="padding: 0.5rem 1.2rem;">Register</a>
+    </div>
+</nav>
 
+<main class="container">
     <!-- Hero Section -->
-    <section class="hero fade-in">
+    <div class="hero fade-in">
         <div class="hero-content">
-            <h1>Your Health is Our Top Priority</h1>
-            <p>Experience world-class healthcare with our modern facilities and expert medical professionals. We are dedicated to providing the best care for you and your family.</p>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-primary" onclick="handleBookAppointment()">Book Appointment</button>
-                <a href="register.html" class="btn btn-outline">Join Us</a>
+            <span class="badge"><i class="fas fa-heartbeat"></i> Trusted by 50,000+ patients</span>
+            <h1>Your Health is <br>Our Top Priority</h1>
+            <p>Experience world-class healthcare with our modern facilities, AI-integrated hospital management, and expert medical professionals dedicated to you and your family.</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="handleBookAppointment()"><i class="fas fa-calendar-check"></i> Book Appointment</button>
+                <a href="available-doctors.html" class="btn btn-outline"><i class="fas fa-user-md"></i> Our Doctors</a>
+                <a href="register.html" class="btn btn-outline"><i class="fas fa-user-plus"></i> Join Us</a>
             </div>
         </div>
         <div class="hero-image">
-            <!-- Using a placeholder image for demo purposes -->
-            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital Care">
+            <img src="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital Excellence">
         </div>
-    </section>
+    </div>
+
+    <!-- Stats Counter (enhanced trust) -->
+    <div class="stats-section fade-in">
+        <div class="stats-grid">
+            <div class="stat-item"><h3>150+</h3><p>Expert Doctors</p></div>
+            <div class="stat-item"><h3>24/7</h3><p>Emergency Care</p></div>
+            <div class="stat-item"><h3>10k+</h3><p>Satisfied Families</p></div>
+            <div class="stat-item"><h3>98%</h3><p>Patient Satisfaction</p></div>
+        </div>
+    </div>
 
     <!-- Services Section -->
-    <section class="section fade-in">
-        <h2 class="section-title">Our Services</h2>
+    <section id="services" class="fade-in">
+        <div class="section-header">
+            <h2>Premium Healthcare Services</h2>
+            <p>Comprehensive medical solutions designed for you, from diagnostics to advanced surgery — all under one roof.</p>
+        </div>
         <div class="services-grid">
-            <div class="card service-card">
-                <div class="service-icon">👨‍⚕️</div>
-                <h3>Expert Doctors</h3>
-                <p>Consult with highly qualified and experienced specialists for accurate diagnosis and treatment.</p>
-            </div>
-            <div class="card service-card">
-                <div class="service-icon">🚑</div>
-                <h3>24/7 Emergency</h3>
-                <p>Round-the-clock emergency services to handle any medical critical situations with utmost priority.</p>
-            </div>
-            <div class="card service-card">
-                <div class="service-icon">🔬</div>
-                <h3>Modern Lab</h3>
-                <p>Fully equipped laboratories ensuring precise tests and quick delivery of health reports.</p>
-            </div>
+            <div class="service-card"><div class="service-icon"><i class="fas fa-stethoscope fa-2x"></i></div><h3>Expert Consultation</h3><p>Top specialists across 30+ disciplines with personalized treatment plans.</p></div>
+            <div class="service-card"><div class="service-icon"><i class="fas fa-ambulance fa-2x"></i></div><h3>Rapid Emergency</h3><p>24/7 trauma center, ambulance ready within 5 minutes response.</p></div>
+            <div class="service-card"><div class="service-icon"><i class="fas fa-microscope fa-2x"></i></div><h3>Advanced Diagnostics</h3><p>State-of-art labs with instant digital reports & AI-assisted imaging.</p></div>
+            <div class="service-card"><div class="service-icon"><i class="fas fa-procedures fa-2x"></i></div><h3>Inpatient Care</h3><p>Luxury private wards, critical care units & ICU with 24/7 monitoring.</p></div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="section fade-in" style="background-color: var(--white); padding-top: 4rem; padding-bottom: 4rem; border-radius: var(--border-radius); box-shadow: var(--shadow);">
-        <h2 class="section-title">About Us</h2>
-        <p style="text-align: center; max-width: 800px; margin: 0 auto; color: var(--text-light); font-size: 1.1rem;">
-            HMS Care is a leading healthcare provider committed to delivering comprehensive medical services. 
-            Our modern infrastructure, coupled with advanced technology and a compassionate team, ensures that every patient receives personalized and top-tier care.
-            Our hospital management system integrates all departments to provide a seamless and efficient experience from appointment booking to recovery.
+    <!-- Departments Section -->
+    <section id="departments" class="fade-in" style="margin: 4rem 0;">
+        <div class="section-header">
+            <h2>Centers of Excellence</h2>
+            <p>Multi-speciality departments driven by innovation and compassion.</p>
+        </div>
+        <div class="dept-preview">
+            <div class="dept-card"><i class="fas fa-heartbeat"></i> Cardiology</div>
+            <div class="dept-card"><i class="fas fa-brain"></i> Neurology</div>
+            <div class="dept-card"><i class="fas fa-bone"></i> Orthopedics</div>
+            <div class="dept-card"><i class="fas fa-child"></i> Pediatrics</div>
+            <div class="dept-card"><i class="fas fa-female"></i> Gynecology</div>
+            <div class="dept-card"><i class="fas fa-eye"></i> Ophthalmology</div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="fade-in">
+        <div class="section-header">
+            <h2>Patient Stories</h2>
+            <p>Real experiences, real care — our commitment to healing.</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card"><i class="fas fa-quote-left"></i><p>"The seamless digital experience from booking to discharge was incredible. HMS truly cares."</p><h4 style="margin-top:1rem;">— Sarah Johnson</h4></div>
+            <div class="testimonial-card"><i class="fas fa-quote-left"></i><p>"Emergency team saved my father’s life within the golden hour. Forever grateful."</p><h4 style="margin-top:1rem;">— Michael Chen</h4></div>
+            <div class="testimonial-card"><i class="fas fa-quote-left"></i><p>"Advanced robotic surgery and post-op care were world-class. Highly recommended."</p><h4 style="margin-top:1rem;">— Dr. Anita Sharma</h4></div>
+        </div>
+    </section>
+
+    <!-- About Us Modern -->
+    <section class="fade-in" style="background: var(--white); border-radius: 40px; padding: 2.5rem; margin: 3rem 0; box-shadow: var(--shadow-sm);">
+        <div class="section-header">
+            <h2>About HMS Care</h2>
+            <p>Redefining hospital management with technology & empathy.</p>
+        </div>
+        <p style="font-size: 1.05rem; text-align: center; max-width: 900px; margin: 0 auto; color: var(--text-light);">
+            HMS Care integrates a next-gen Hospital Management System that streamlines appointments, electronic health records, billing, and telemedicine — helping doctors focus on what matters most: saving lives. Since 2015, we have been a beacon of medical excellence with JCI accreditation and a patient-first approach.
         </p>
     </section>
 
-    <!-- Scripts -->
-    <script src="js/ui.js"></script>
-    <script>
-        // Check token and redirect logic for Book Appointment button
-        function handleBookAppointment() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                // If no token -> redirect to login.html
-                window.location.href = 'login.html';
-            } else {
-                // ELSE -> go to book-appointment.html
-                window.location.href = 'book-appointment.html';
+    <!-- Call to Action -->
+    <div class="cta-section fade-in">
+        <h3>Ready to experience compassionate healthcare?</h3>
+        <p style="margin-top:0.5rem;">Book your appointment online or visit our nearest center.</p>
+        <button class="btn btn-white" onclick="handleBookAppointment()"><i class="fas fa-calendar-alt"></i> Schedule now</button>
+    </div>
+</main>
+
+<!-- Enhanced Footer -->
+<footer class="footer" id="contact">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col"><h4><i class="fas fa-hospital"></i> HMS Care</h4><p>Leading digital healthcare ecosystem with patient-centric values and advanced medical infrastructure.</p><div style="margin-top: 15px;"><i class="fab fa-facebook"></i>   <i class="fab fa-twitter"></i>   <i class="fab fa-linkedin"></i></div></div>
+            <div class="footer-col"><h4>Quick Links</h4><a href="index.html">Home</a><a href="available-doctors.html">Find a Doctor</a><a href="book-appointment.html">Appointments</a><a href="login.html">Patient Portal</a></div>
+            <div class="footer-col"><h4>Contact</h4><p><i class="fas fa-map-marker-alt"></i> 123 Healthcare Ave, Medical District, NY 10001</p><p><i class="fas fa-phone-alt"></i> +1 (888) 765-4321</p><p><i class="fas fa-envelope"></i> support@hmscare.com</p></div>
+            <div class="footer-col"><h4>Hours</h4><p>Emergency: 24/7/365</p><p>OPD: Mon-Sat 8am - 8pm</p><p>Pharmacy & Labs: 24/7</p></div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 HMS Care — Integrated Hospital Management System. All rights reserved. | <a href="#" style="color:#cbd5e1;">Privacy Policy</a> | <a href="#" style="color:#cbd5e1;">Terms of Use</a></p>
+        </div>
+    </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    // Intersection Observer for fade-in animations
+    const fadeElements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
             }
+        });
+    }, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
+    fadeElements.forEach(el => observer.observe(el));
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        let icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : 'ℹ️');
+        toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 20);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
+    }
+
+    // Handle Book Appointment button with auth check
+    function handleBookAppointment() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showToast('Please login to book appointment', 'info');
+            setTimeout(() => { window.location.href = 'login.html'; }, 800);
+        } else {
+            showToast('Redirecting to appointment booking...', 'success');
+            setTimeout(() => { window.location.href = 'book-appointment.html'; }, 500);
         }
-    </script>
+    }
+
+    // small demo: if someone clicks on "Our Doctors" or register link we don't break
+    document.querySelectorAll('a[href="available-doctors.html"], a[href="register.html"], a[href="login.html"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // just allow navigation, but we keep consistent
+            if(link.getAttribute('href') === 'login.html' || link.getAttribute('href') === 'register.html'){
+                // no need to block, works as usual
+            }
+        });
+    });
+
+    // if there is any external demo, show ready msg
+    window.onload = () => {
+        // pre-show visible for any elements already visible
+        fadeElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if(rect.top < window.innerHeight - 100) el.classList.add('visible');
+        });
+    };
+</script>
 </body>
 </html>

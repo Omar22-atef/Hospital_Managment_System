@@ -52,6 +52,7 @@ public class AdminFacadeService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .specialization(dto.getSpecialization())
+                .consultationFee(dto.getConsultationFee())
                 .phone(dto.getPhone())
                 .dayOfWeek(dto.getDayOfWeek())
                 .startTime(dto.getStartTime())
@@ -69,7 +70,10 @@ public class AdminFacadeService {
                         .appointmentTime(a.getAppointmentTime())
                         .status(a.getStatus())
                         .patientId(a.getPatient().getId())
+                        .patientName(a.getPatient().getName())
                         .doctorId(a.getDoctor().getId())
+                        .doctorName(a.getDoctor().getName())
+                        .consultationFee(a.getDoctor().getConsultationFee())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -81,6 +85,7 @@ public class AdminFacadeService {
         doctor.setName(dto.getName());
         doctor.setEmail(dto.getEmail());
         doctor.setSpecialization(dto.getSpecialization());
+        doctor.setConsultationFee(dto.getConsultationFee());
         doctor.setPhone(dto.getPhone());
         doctor.setDayOfWeek(dto.getDayOfWeek());
         doctor.setStartTime(dto.getStartTime());
@@ -117,6 +122,7 @@ public class AdminFacadeService {
                 .name(d.getName())
                 .email(d.getEmail())
                 .specialization(d.getSpecialization())
+                .consultationFee(d.getConsultationFee())
                 .phone(d.getPhone())
                 .dayOfWeek(d.getDayOfWeek())
                 .startTime(d.getStartTime())

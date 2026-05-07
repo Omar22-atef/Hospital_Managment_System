@@ -5,12 +5,14 @@ import com.project.HospitalManagmentSystem.enums.DaysOfWeek;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @Data
@@ -34,13 +36,18 @@ public class DoctorRequestDTO {
     @NotBlank(message = "Doctor Specialization is required")
     private String specialization;
 
+    @NotNull(message = "Consultation Fee is required")
+    @Positive(message = "Consultation Fee must be positive")
+    private BigDecimal consultationFee;
+
     @NotNull(message = "Day of Week is required")
     private DaysOfWeek dayOfWeek;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @NotNull(message = "Start Time is required")
     private LocalTime startTime;
 
-    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @NotNull(message = "End Time is required")
     private LocalTime endTime;
 }

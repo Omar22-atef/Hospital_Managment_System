@@ -9,6 +9,7 @@ import com.stripe.model.Charge;
 import com.stripe.exception.StripeException;
 import com.project.HospitalManagmentSystem.dto.PaymentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
+import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.entity.Payment;
 import com.project.HospitalManagmentSystem.repository.PaymentRepository;
 import com.project.HospitalManagmentSystem.repository.AppointmentRepository;
@@ -23,39 +24,64 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final AppointmentRepository appointmentRepository;
 
+    private static final String STRIPE_SECRET_KEY =
+            "sk_test_51TSiJ0Q5CVl6R8ElZb3hHeFtozP1lwxw9XIcQeNsLBIg0nAb06rkzBwKMDnY5WVlBE9psWX4coWKUvDwcCzbv2i300Mb5jzS8B";
+
     public PaymentResponseDTO createPayment(PaymentRequestDTO request) {
-        // 1. Initialize Stripe (Use a test key from Stripe dashboard)
-        Stripe.apiKey = "sk_test_your_key_here";
 
-        try {
-            // 2. Create the Charge params
-            Map<String, Object> params = new HashMap<>();
-            // Stripe uses cents (e.g., $10.00 = 1000)
-            params.put("amount", request.getAmount().multiply(new BigDecimal(100)).intValue());
-            params.put("currency", "usd");
-            params.put("description", "Hospital Bill - Appointment #" + request.getAppointmentId());
-            params.put("source", request.getStripeToken());
+        // Look up the appointment to derive the consultation fee from the doctor
+        Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-            // 3. Make the actual charge
-            Charge charge = Charge.create(params);
+        // The amount is the doctor's consultation fee — NOT supplied by the client
+        BigDecimal amount = appointment.getDoctor().getConsultationFee();
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Doctor consultation fee is not configured");
+        }
 
-            // 4. If successful, save to your DB
-            var appointment = appointmentRepository.findById(request.getAppointmentId())
-                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        Payment payment;
 
-            Payment payment = Payment.builder()
-                    .amount(request.getAmount())
+        if (request.getPaymentMethod() == PaymentMethod.CREDIT_CARD) {
+            // ── Stripe credit card charge ──────────────────────────────
+            Stripe.apiKey = STRIPE_SECRET_KEY;
+
+            if (request.getStripeToken() == null || request.getStripeToken().isBlank()) {
+                throw new RuntimeException("Stripe token is required for credit card payments");
+            }
+
+            try {
+                Map<String, Object> params = new HashMap<>();
+                // Stripe uses integer cents: $10.00 → 1000
+                params.put("amount", amount.multiply(new BigDecimal(100)).intValue());
+                params.put("currency", "usd");
+                params.put("description", "Hospital Consultation – Appointment #" + request.getAppointmentId());
+                params.put("source", request.getStripeToken());
+
+                Charge charge = Charge.create(params);
+
+                payment = Payment.builder()
+                        .amount(amount)
+                        .paymentStatus(PaymentStatus.PAID)
+                        .paymentMethod(PaymentMethod.CREDIT_CARD)
+                        .stripePaymentId(charge.getId())
+                        .appointment(appointment)
+                        .build();
+
+            } catch (StripeException e) {
+                throw new RuntimeException("Stripe Payment Failed: " + e.getMessage());
+            }
+
+        } else {
+            // ── Cash payment — record immediately as PAID ──────────────
+            payment = Payment.builder()
+                    .amount(amount)
                     .paymentStatus(PaymentStatus.PAID)
-                    .paymentMethod(PaymentMethod.CREDIT_CARD)
-                    .stripePaymentId(charge.getId()) // Save the Stripe ID!
+                    .paymentMethod(PaymentMethod.CASH)
                     .appointment(appointment)
                     .build();
-
-            return mapToResponse(paymentRepository.save(payment));
-
-        } catch (StripeException e) {
-            throw new RuntimeException("Stripe Payment Failed: " + e.getMessage());
         }
+
+        return mapToResponse(paymentRepository.save(payment));
     }
 
     public List<PaymentResponseDTO> getAllPayments() {

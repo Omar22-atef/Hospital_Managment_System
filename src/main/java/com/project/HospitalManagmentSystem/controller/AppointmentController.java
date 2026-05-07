@@ -110,10 +110,27 @@ public class AppointmentController {
 
     @PreAuthorize("hasRole('PATIENT')")
     @GetMapping("/booked-slots/{doctorId}")
-    public ResponseEntity<?> getBookedSlots(@PathVariable Long doctorId) {
+    public ResponseEntity<?> getBookedSlots(
+            @PathVariable Long doctorId,
+            @RequestParam(required = false) String date) {
+
+        if (date == null || date.trim().isEmpty() || "undefined".equals(date)) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse<>("Valid date parameter is required", null)
+            );
+        }
+
+        LocalDate localDate;
+        try {
+            localDate = LocalDate.parse(date);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse<>("Invalid date format. Expected YYYY-MM-DD", null)
+            );
+        }
 
         return ResponseEntity.ok(
-                appointmentService.getBookedSlots(doctorId)
+                appointmentService.getBookedSlots(doctorId, localDate)
         );
     }
 }

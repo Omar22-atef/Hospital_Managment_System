@@ -19,8 +19,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             Long doctorId,
             AppointmentStatus status
     );
+    // Date-aware query: returns booked slots for a specific doctor on a specific date
+    List<Appointment> findByDoctorIdAndAppointmentDateAndStatusNot(
+            Long doctorId,
+            LocalDate appointmentDate,
+            AppointmentStatus status
+    );
     boolean existsByDoctorIdAndAppointmentDateAndAppointmentTime(Long doctorId, LocalDate date, LocalTime time);
     long countByDoctorIdAndAppointmentDateAndStatusNot(Long doctorId, LocalDate date, AppointmentStatus status);
-
-
 }

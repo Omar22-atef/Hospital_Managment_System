@@ -13,6 +13,24 @@
             align-items: center;
             margin-bottom: 2rem;
         }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -20,6 +38,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 2rem;
         }
         th, td {
             padding: 1rem;
@@ -36,9 +55,10 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-approved { background-color: #d4edda; color: #155724; }
-        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        .status-pending   { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .status-completed { background-color: #cce5ff; color: #004085; }
     </style>
 </head>
 <body>
@@ -46,7 +66,7 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-brand">
-            🏥 HMS Care - Admin Portal
+            MediCore - Admin Portal
         </div>
         <div class="navbar-links">
             <!-- Populated by ui.js -->
@@ -56,7 +76,53 @@
     <!-- Dashboard Content -->
     <div class="section fade-in">
         <div class="dashboard-header">
-            <h2>Welcome, Administrator!</h2>
+            <h2 id="welcomeAdmin">Welcome!</h2>
+            <div>
+                <a href="manage-doctors.html" class="btn btn-primary">Manage Doctors</a>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><h3>...</h3><p>Loading Stats</p></div>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3>All Doctors</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctorsBody">
+                        <tr><td colspan="4" style="text-align: center;">Loading doctors...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3>All Patients</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsBody">
+                        <tr><td colspan="4" style="text-align: center;">Loading patients...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="card">
@@ -87,17 +153,100 @@
     <script src="js/ui.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/appointments.js"></script>
+    <script src="js/admin.js"></script>
     
     <script>
-        // Require Authentication
         requireAuth();
 
         document.addEventListener('DOMContentLoaded', async () => {
+            loadDashboardStats();
+            loadDoctorsList();
+            loadPatientsList();
+            loadAppointmentsList();
+            loadAdminProfile();
+        });
+
+        async function loadDashboardStats() {
+            const grid = document.getElementById('statsGrid');
+            try {
+                const stats = await getAdminDashboard();
+                if (!stats) throw new Error("No data returned");
+                
+                grid.innerHTML = `
+                    <div class="stat-card">
+                        <h3>${stats.totalPatients || 0}</h3>
+                        <p>Total Patients</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${stats.totalDoctors || 0}</h3>
+                        <p>Total Doctors</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${stats.totalAppointments || 0}</h3>
+                        <p>Total Appointments</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${stats.totalPayments || 0}</h3>
+                        <p>Total Payments</p>
+                    </div>
+                `;
+            } catch (error) {
+                grid.innerHTML = `<div class="stat-card" style="grid-column: 1/-1; color: red;"><p>Failed to load statistics: ${error.message}</p></div>`;
+            }
+        }
+
+        async function loadDoctorsList() {
+            const tbody = document.getElementById('doctorsBody');
+            try {
+                const doctors = await getAllDoctors();
+                if (!doctors || doctors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No doctors found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                doctors.forEach(doc => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${doc.id || '-'}</td>
+                        <td>${doc.name || 'Unknown'}</td>
+                        <td>${doc.specialization || 'N/A'}</td>
+                        <td>${doc.email || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Failed to load doctors: ${error.message}</td></tr>`;
+            }
+        }
+
+        async function loadPatientsList() {
+            const tbody = document.getElementById('patientsBody');
+            try {
+                const patients = await getAllPatients();
+                if (!patients || patients.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No patients found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                patients.forEach(pat => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${pat.id || '-'}</td>
+                        <td>${pat.name || 'Unknown'}</td>
+                        <td>${pat.email || 'N/A'}</td>
+                        <td>${pat.phone || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Failed to load patients: ${error.message}</td></tr>`;
+            }
+        }
+
+        async function loadAppointmentsList() {
             const tbody = document.getElementById('appointmentsBody');
             try {
-                const appointments = await getAppointments();
-                
+                const appointments = await getAllAppointments();
                 if (!appointments || appointments.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No appointments found in the system.</td></tr>';
                     return;
@@ -105,27 +254,52 @@
 
                 tbody.innerHTML = '';
                 appointments.forEach(app => {
-                    let statusClass = 'status-pending';
+                    // AppointmentStatus enum: PENDING, CONFIRMED, CANCELLED, COMPLETED
                     const status = (app.status || 'PENDING').toUpperCase();
-                    if (status === 'APPROVED' || status === 'CONFIRMED') statusClass = 'status-approved';
-                    else if (status === 'REJECTED' || status === 'CANCELLED') statusClass = 'status-rejected';
+                    let statusClass = 'status-pending';
+                    if (status === 'CONFIRMED') statusClass = 'status-confirmed';
+                    else if (status === 'CANCELLED') statusClass = 'status-cancelled';
+                    else if (status === 'COMPLETED') statusClass = 'status-completed';
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>#${app.id || '-'}</td>
-                        <td>${app.patientName || app.patientEmail || 'Patient'}</td>
-                        <td>${app.doctorName || app.doctorEmail || 'Doctor'}</td>
-                        <td>${app.appointmentDate || app.date || '-'}</td>
-                        <td>${app.appointmentTime || app.time || '-'}</td>
+                        <td>${app.patientName || '-'}</td>
+                        <td>${app.doctorName || '-'}</td>
+                        <td>${app.appointmentDate || '-'}</td>
+                        <td>${app.appointmentTime || '-'}</td>
                         <td><span class="status-badge ${statusClass}">${status}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (error) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load appointments: ${error.message}</td></tr>`;
-                showToast("Failed to load appointments", "error");
             }
-        });
+        }
+
+        async function loadAdminProfile() {
+
+            try {
+
+                const response = await apiFetch('/api/admin/me');
+
+                console.log("ADMIN RESPONSE:", response);
+
+                const admin = response.data ? response.data : response;
+
+                document.getElementById('welcomeAdmin').innerText =
+                    `Welcome, ${admin.name || 'Administrator'}!`;
+
+            } catch (error) {
+
+                console.error("Failed to load admin profile", error);
+
+                document.getElementById('welcomeAdmin').innerText =
+                    'Welcome, Administrator!';
+            }
+        }
+
+
     </script>
 </body>
 </html>

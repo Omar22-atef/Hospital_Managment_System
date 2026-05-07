@@ -11,7 +11,6 @@ public interface PaymentMapper {
         if (dto == null) return null;
 
         Payment payment = new Payment();
-        payment.setAmount(dto.getAmount());
         payment.setPaymentMethod(dto.getPaymentMethod());
 
         payment.setPaymentStatus(PaymentStatus.PENDING);

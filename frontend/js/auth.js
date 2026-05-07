@@ -100,20 +100,103 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetPasswordForm) resetPasswordForm.addEventListener('submit', resetPassword);
 });
 
+
+/**
+ * Validate Date of Birth
+ * Minimum age = 16
+ * No future dates allowed
+ */
+function validateDateOfBirth(dateOfBirth) {
+
+    if (!dateOfBirth) {
+        return "Date of birth is required.";
+    }
+
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+
+    // Future date check
+    if (birthDate > today) {
+        return "Date of birth cannot be in the future.";
+    }
+
+    // Calculate age
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+        age--;
+    }
+
+    // Minimum age check
+    if (age < 16) {
+        return "You must be at least 16 years old to register.";
+    }
+
+    return true;
+}
+
+/**
+ * Password Validation
+ * Minimum 8 chars
+ * At least:
+ * - 1 uppercase
+ * - 1 lowercase
+ * - 1 number
+ * - 1 special char
+ */
+function validatePassword(password) {
+
+    if (!password || password.trim() === "") {
+        return "Password is required.";
+    }
+
+    if (password.length < 8) {
+        return "Password must be at least 8 characters.";
+    }
+
+    const upperCaseRegex = /[A-Z]/;
+    const lowerCaseRegex = /[a-z]/;
+    const numberRegex = /[0-9]/;
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!upperCaseRegex.test(password)) {
+        return "Password must contain at least one uppercase letter.";
+    }
+
+    if (!lowerCaseRegex.test(password)) {
+        return "Password must contain at least one lowercase letter.";
+    }
+
+    if (!numberRegex.test(password)) {
+        return "Password must contain at least one number.";
+    }
+
+    if (!specialCharRegex.test(password)) {
+        return "Password must contain at least one special character.";
+    }
+
+    return true;
+}
+
 /**
  * Handles the registration process
  * @param {Event} event 
  */
 async function register(event) {
+
     event.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const phone = document.getElementById('phone').value;
+    const phone = document.getElementById('phone').value.trim();
     const dateOfBirth = document.getElementById('dateOfBirth').value;
-    // Assuming the user registers as a patient based on the prompt's API contract.
-    // If a different role is needed in the future, it can be passed or selected.
+
     const role = "PATIENT";
 
     if (!name || !email || !password || !phone || !dateOfBirth) {
@@ -121,21 +204,53 @@ async function register(event) {
         return;
     }
 
+    // DOB Validation
+    const dobValidation = validateDateOfBirth(dateOfBirth);
+
+    if (dobValidation !== true) {
+        showToast(dobValidation, "error");
+        return;
+    }
+
+    // Password Validation
+    const passwordValidation = validatePassword(password);
+
+    if (passwordValidation !== true) {
+        showToast(passwordValidation, "error");
+        return;
+    }
+
     try {
-        const payload = { name, email, password, phone, dateOfBirth, role };
+
+        const payload = {
+            name,
+            email,
+            password,
+            phone,
+            dateOfBirth,
+            role
+        };
+
         await apiFetch('/api/auth/register', {
             method: 'POST',
             body: JSON.stringify(payload)
         });
 
-        showToast("Registration successful! Redirecting to login...", "success");
+        showToast(
+            "Registration successful! Redirecting to login...",
+            "success"
+        );
 
         setTimeout(() => {
             window.location.href = 'login.html';
         }, 1500);
 
     } catch (error) {
-        showToast(error.message || "Registration failed", "error");
+
+        showToast(
+            error.message || "Registration failed",
+            "error"
+        );
     }
 }
 
@@ -180,35 +295,65 @@ async function forgotPassword(event) {
  * @param {Event} event 
  */
 async function resetPassword(event) {
+
     event.preventDefault();
 
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const role = document.getElementById('role').value;
-    const otpCode = document.getElementById('otpCode').value;
+    const otpCode = document.getElementById('otpCode').value.trim();
     const newPassword = document.getElementById('newPassword').value;
 
     if (!email || !role || !otpCode || !newPassword) {
-        showToast("Please fill in all fields.", "error");
+
+        showToast(
+            "Please fill in all fields.",
+            "error"
+        );
+
+        return;
+    }
+
+    // Password validation
+    const passwordValidation = validatePassword(newPassword);
+
+    if (passwordValidation !== true) {
+
+        showToast(passwordValidation, "error");
+
         return;
     }
 
     try {
+
         await apiFetch('/api/auth/reset-password', {
+
             method: 'POST',
-            body: JSON.stringify({ email, role, otpCode, newPassword })
+
+            body: JSON.stringify({
+                email,
+                role,
+                otpCode,
+                newPassword
+            })
         });
 
-        // Clear session storage since it's no longer needed
         sessionStorage.removeItem('resetEmail');
         sessionStorage.removeItem('resetRole');
 
-        showToast("Password reset successfully. Please login.", "success");
+        showToast(
+            "Password reset successfully. Please login.",
+            "success"
+        );
 
         setTimeout(() => {
             window.location.href = 'login.html';
         }, 1500);
 
     } catch (error) {
-        showToast(error.message || "Failed to reset password", "error");
+
+        showToast(
+            error.message || "Failed to reset password",
+            "error"
+        );
     }
 }

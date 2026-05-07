@@ -36,9 +36,10 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-approved { background-color: #d4edda; color: #155724; }
-        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        .status-pending   { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .status-completed { background-color: #cce5ff; color: #004085; }
         
         .action-btn {
             padding: 0.4rem 0.8rem;
@@ -50,16 +51,32 @@
             margin-right: 0.5rem;
             transition: var(--transition);
         }
-        .btn-approve {
-            background-color: #2ecc71;
-            color: white;
+        .btn-approve  { background-color: #2ecc71; color: white; }
+        .btn-approve:hover  { background-color: #27ae60; transform: scale(1.05); }
+        .btn-complete { background-color: #3498db; color: white; }
+        .btn-complete:hover { background-color: #2980b9; transform: scale(1.05); }
+        .btn-reject   { background-color: #e74c3c; color: white; }
+        .btn-reject:hover   { background-color: #c0392b; transform: scale(1.05); }
+
+        /* Profile card */
+        .profile-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
-        .btn-approve:hover { background-color: #27ae60; transform: scale(1.05); }
-        .btn-reject {
-            background-color: #e74c3c;
-            color: white;
+        .profile-avatar {
+            font-size: 3rem;
+            width: 70px; height: 70px;
+            display: flex; align-items: center; justify-content: center;
+            background: #e0f7fa; border-radius: 50%;
         }
-        .btn-reject:hover { background-color: #c0392b; transform: scale(1.05); }
+        .profile-info h3 { margin: 0 0 0.25rem; }
+        .profile-info p  { margin: 0; color: var(--text-light); font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -67,7 +84,7 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-brand">
-            🏥 HMS Care - Doctor Portal
+            MediCore - Doctor Portal
         </div>
         <div class="navbar-links">
             <!-- Populated by ui.js -->
@@ -77,7 +94,17 @@
     <!-- Dashboard Content -->
     <div class="section fade-in">
         <div class="dashboard-header">
-            <h2>Welcome, Doctor!</h2>
+            <h2>Doctor Dashboard</h2>
+        </div>
+
+        <!-- Doctor Profile Card -->
+        <div class="profile-card" id="doctorProfileCard">
+            <div class="profile-avatar">👨‍⚕️</div>
+            <div class="profile-info">
+                <h3 id="doctorName">Loading...</h3>
+                <p id="doctorSpec">Specialization</p>
+                <p id="doctorSchedule">Schedule</p>
+            </div>
         </div>
 
         <div class="card">
@@ -111,16 +138,46 @@
     <script src="js/appointments.js"></script>
     
     <script>
-        // Require Authentication
         requireAuth();
+
+        // Load doctor profile from GET /api/doctor/me
+        async function loadDoctorProfile() {
+            try {
+                const doc = await apiFetch('/api/doctor/me');
+                if (doc) {
+                    document.getElementById('doctorName').textContent = 'Dr. ' + (doc.name || 'Unknown');
+                    document.getElementById('doctorSpec').textContent = doc.specialization || '';
+                    const day   = doc.dayOfWeek ? doc.dayOfWeek.charAt(0) + doc.dayOfWeek.slice(1).toLowerCase() : '';
+                    const start = doc.startTime ? doc.startTime.substring(0,5) : '';
+                    const end   = doc.endTime   ? doc.endTime.substring(0,5)   : '';
+                    document.getElementById('doctorSchedule').textContent =
+                        day && start ? `${day}s  ${start} – ${end}` : '';
+                }
+            } catch(e) {
+                // profile load failure is non-fatal
+                console.warn('Could not load doctor profile', e);
+            }
+        }
 
         async function handleStatusUpdate(id, newStatus) {
             try {
-                await updateAppointmentStatus(id, newStatus);
-                showToast(`Appointment ${newStatus.toLowerCase()} successfully`, "success");
-                loadAppointments(); // Reload list
+                if (newStatus === 'CANCELLED') {
+                    const reason = prompt('Please provide a reason for cancellation:');
+                    if (reason === null) return;
+                    if (!reason.trim()) {
+                        showToast('Cancellation reason is required.', 'error');
+                        return;
+                    }
+                    await updateAppointmentStatus(id, newStatus, reason.trim());
+                    showToast('Appointment cancelled and patient notified.', 'success');
+                } else {
+                    await updateAppointmentStatus(id, newStatus);
+                    const label = newStatus === 'CONFIRMED' ? 'confirmed' : 'completed';
+                    showToast(`Appointment ${label} successfully`, 'success');
+                }
+                loadAppointments();
             } catch (error) {
-                showToast(error.message || `Failed to ${newStatus} appointment`, "error");
+                showToast(error.message || `Failed to update appointment`, 'error');
             }
         }
 
@@ -136,34 +193,49 @@
 
                 tbody.innerHTML = '';
                 appointments.forEach(app => {
-                    let statusClass = 'status-pending';
+                    // AppointmentStatus enum: PENDING, CONFIRMED, CANCELLED, COMPLETED
                     const status = (app.status || 'PENDING').toUpperCase();
-                    if (status === 'APPROVED' || status === 'CONFIRMED') statusClass = 'status-approved';
-                    else if (status === 'REJECTED' || status === 'CANCELLED') statusClass = 'status-rejected';
+                    let statusClass = 'status-pending';
+                    if (status === 'CONFIRMED') statusClass = 'status-confirmed';
+                    else if (status === 'CANCELLED') statusClass = 'status-cancelled';
+                    else if (status === 'COMPLETED') statusClass = 'status-completed';
 
-                    const actionsHtml = status === 'PENDING' ? `
-                        <button class="action-btn btn-approve" onclick="handleStatusUpdate(${app.id}, 'APPROVED')">Approve</button>
-                        <button class="action-btn btn-reject" onclick="handleStatusUpdate(${app.id}, 'REJECTED')">Reject</button>
-                    ` : `<span style="color: #888; font-size: 0.9rem;">No actions</span>`;
+                    let actionsHtml;
+                    if (status === 'PENDING') {
+                        actionsHtml = `
+                            <button class="action-btn btn-approve"  onclick="handleStatusUpdate(${app.id}, 'CONFIRMED')">Confirm</button>
+                            <button class="action-btn btn-reject"   onclick="handleStatusUpdate(${app.id}, 'CANCELLED')">Cancel</button>
+                        `;
+                    } else if (status === 'CONFIRMED') {
+                        actionsHtml = `
+                            <button class="action-btn btn-complete" onclick="handleStatusUpdate(${app.id}, 'COMPLETED')">Complete</button>
+                            <button class="action-btn btn-reject"   onclick="handleStatusUpdate(${app.id}, 'CANCELLED')">Cancel</button>
+                        `;
+                    } else {
+                        actionsHtml = `<span style="color:#888;font-size:0.9rem;">No actions</span>`;
+                    }
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>#${app.id || '-'}</td>
-                        <td>${app.patientName || app.patientEmail || 'Patient'}</td>
-                        <td>${app.appointmentDate || app.date || '-'}</td>
-                        <td>${app.appointmentTime || app.time || '-'}</td>
+                        <td>${app.patientName || '-'}</td>
+                        <td>${app.appointmentDate || '-'}</td>
+                        <td>${app.appointmentTime || '-'}</td>
                         <td><span class="status-badge ${statusClass}">${status}</span></td>
                         <td>${actionsHtml}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load appointments: ${error.message}</td></tr>`;
-                showToast("Failed to load appointments", "error");
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">Failed to load appointments: ${error.message}</td></tr>`;
+                showToast('Failed to load appointments', 'error');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadAppointments);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDoctorProfile();
+            loadAppointments();
+        });
     </script>
 </body>
 </html>

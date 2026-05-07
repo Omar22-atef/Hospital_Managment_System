@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: var(--background-color); color: var(--text-color); }
+
+        /* AppointmentStatus enum: PENDING, CONFIRMED, CANCELLED, COMPLETED */
+        .status-badge     { padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.85rem; font-weight: 500; }
+        .status-pending   { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .status-completed { background-color: #cce5ff; color: #004085; }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 0.85rem; font-weight: 600;
+            margin-right: 0.4rem; transition: var(--transition);
+        }
+        .btn-cancel      { background-color: #e74c3c; color: white; }
+        .btn-cancel:hover{ background-color: #c0392b; transform: scale(1.05); }
+        .btn-reschedule  { background-color: #f39c12; color: white; }
+        .btn-reschedule:hover{ background-color: #d68910; transform: scale(1.05); }
+
+        /* ── Modal shared ────────────────────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            width: 90%; max-width: 480px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-box h3 { margin-top: 0; }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none; font-size: 1.5rem;
+            cursor: pointer; color: #aaa; line-height: 1;
+        }
+        .modal-close:hover { color: #333; }
+        .hint { font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.5rem; }
+        .slot-disabled { color: #aaa; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">MediCore - Patient Portal</div>
+        <div class="navbar-links"><!-- Populated by ui.js --></div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="section fade-in">
+        <div class="dashboard-header">
+            <h2>My Appointments</h2>
+            <a href="patient-dashboard.html" class="btn btn-outline">Back to Dashboard</a>
+        </div>
+
+        <div class="card">
+            <h3>Appointment History</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsBody">
+                        <tr><td colspan="6" style="text-align:center;">Loading appointments...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Cancel Modal ──────────────────────────────────────────────── -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeCancelModal()" title="Close">&times;</button>
+            <h3>Cancel Appointment</h3>
+            <p class="hint">A reason is required — the patient will be notified by email.</p>
+            <div class="form-group">
+                <label class="form-label" for="cancelReason">Cancellation Reason <span style="color:red;">*</span></label>
+                <textarea id="cancelReason" class="form-control" rows="4"
+                          placeholder="Please describe why you are cancelling..."
+                          style="resize:vertical;"></textarea>
+            </div>
+            <button class="btn btn-primary" id="cancelSubmitBtn"
+                    style="width:100%;background:#e74c3c;border-color:#e74c3c;"
+                    onclick="submitCancel()">Confirm Cancellation</button>
+        </div>
+    </div>
+
+    <!-- ── Reschedule Modal ──────────────────────────────────────────── -->
+    <div class="modal-overlay" id="rescheduleModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeRescheduleModal()" title="Close">&times;</button>
+            <h3>Reschedule Appointment</h3>
+            <p class="hint" id="rescheduleHint">Select a new date and time slot.</p>
+            <form id="rescheduleForm" style="margin-top:1rem;" onsubmit="submitReschedule(event)">
+                <input type="hidden" id="rescheduleApptId">
+                <input type="hidden" id="rescheduleDoctorId">
+                <input type="hidden" id="rescheduleDoctorDay">   <!-- e.g. MONDAY -->
+                <input type="hidden" id="rescheduleDoctorStart"> <!-- e.g. 09:00:00 -->
+                <input type="hidden" id="rescheduleDoctorEnd">   <!-- e.g. 17:00:00 -->
+
+                <div class="form-group">
+                    <label class="form-label" for="rescheduleDate">
+                        New Date <span style="color:red;">*</span>
+                    </label>
+                    <input type="date" id="rescheduleDate" class="form-control" required
+                           onchange="onRescheduleDateChange()">
+                    <p id="dateHint" class="hint" style="margin-top:0.25rem;"></p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rescheduleTime">
+                        Available Time Slot <span style="color:red;">*</span>
+                    </label>
+                    <select id="rescheduleTime" class="form-control" required>
+                        <option value="">— Pick a date first —</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="rescheduleSubmitBtn"
+                        style="width:100%;margin-top:0.5rem;">Confirm Reschedule</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/patient.js"></script>
+    <script src="js/appointments.js"></script>
+
+    <script>
+        requireAuth();
+
+        // ── Day-of-week lookup ─────────────────────────────────────────
+        const DAY_MAP = {
+            SUNDAY: 0, MONDAY: 1, TUESDAY: 2,
+            WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6
+        };
+
+        // ── Load appointments ──────────────────────────────────────────
+        async function loadAppointments() {
+            const tbody = document.getElementById('appointmentsBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+            try {
+                // GET /api/patient/appointments → List<AppointmentResponseDTO> (no wrapper)
+                // DTO fields: id, appointmentDate, appointmentTime, status, patientId, doctorId, doctorName, patientName
+                const appointments = await getPatientAppointments();
+
+                if (!appointments || appointments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No appointments found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                appointments.forEach(app => {
+                    // AppointmentStatus enum: PENDING | CONFIRMED | CANCELLED | COMPLETED
+                    const status = (app.status || 'PENDING').toUpperCase();
+                    let statusClass = 'status-pending';
+                    if (status === 'CONFIRMED') statusClass = 'status-confirmed';
+                    else if (status === 'CANCELLED') statusClass = 'status-cancelled';
+                    else if (status === 'COMPLETED') statusClass = 'status-completed';
+
+                    // Actions: only for non-terminal statuses
+                    let actions = '<span style="color:#aaa;font-size:0.85rem;">—</span>';
+                    if (status === 'PENDING' || status === 'CONFIRMED') {
+                        actions =
+                            '<button class="action-btn btn-reschedule" ' +
+                                'onclick="openRescheduleModal(' + app.id + ',' + app.doctorId + ')">Reschedule</button>' +
+                            '<button class="action-btn btn-cancel" ' +
+                                'onclick="openCancelModal(' + app.id + ')">Cancel</button>';
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>#' + (app.id || '-') + '</td>' +
+                        '<td>' + escHtml(app.doctorName || 'Doctor') + '</td>' +
+                        '<td>' + (app.appointmentDate || '-') + '</td>' +
+                        '<td>' + (app.appointmentTime ? app.appointmentTime.substring(0,5) : '-') + '</td>' +
+                        '<td><span class="status-badge ' + statusClass + '">' + status + '</span></td>' +
+                        '<td>' + actions + '</td>';
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;">Failed to load: ' + escHtml(error.message) + '</td></tr>';
+                showToast('Failed to load appointments', 'error');
+            }
+        }
+
+        // ── Cancel Modal ───────────────────────────────────────────────
+        let pendingCancelId = null;
+
+        function openCancelModal(id) {
+            pendingCancelId = id;
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('cancelModal').classList.add('active');
+            setTimeout(() => document.getElementById('cancelReason').focus(), 50);
+        }
+
+        function closeCancelModal() {
+            pendingCancelId = null;
+            document.getElementById('cancelModal').classList.remove('active');
+        }
+
+        async function submitCancel() {
+            const reason = document.getElementById('cancelReason').value.trim();
+            if (!reason) {
+                showToast('Please enter a cancellation reason.', 'error');
+                document.getElementById('cancelReason').focus();
+                return;
+            }
+
+            const btn = document.getElementById('cancelSubmitBtn');
+            const orig = btn.textContent;
+            btn.textContent = 'Processing...';
+            btn.disabled = true;
+
+            try {
+                // PATCH /api/appointments/{id}/patient-cancel
+                // Body: CancelRequest { cancelReason }  — backend enforces non-blank
+                await patientCancelAppointment(pendingCancelId, reason);
+                showToast('Appointment cancelled successfully.', 'success');
+                closeCancelModal();
+                loadAppointments();
+            } catch (err) {
+                showToast(err.message || 'Failed to cancel appointment', 'error');
+            } finally {
+                btn.textContent = orig;
+                btn.disabled = false;
+            }
+        }
+
+        // ── Reschedule Modal ───────────────────────────────────────────
+        let allDoctors = null; // cached from GET /api/patient/doctors
+
+        async function openRescheduleModal(appointmentId, doctorId) {
+            // Reset modal state
+            document.getElementById('rescheduleApptId').value   = appointmentId;
+            document.getElementById('rescheduleDoctorId').value = doctorId;
+            document.getElementById('rescheduleDate').value     = '';
+            document.getElementById('rescheduleTime').innerHTML = '<option value="">— Pick a date first —</option>';
+            document.getElementById('dateHint').textContent     = '';
+            document.getElementById('rescheduleHint').textContent = 'Loading doctor schedule...';
+            document.getElementById('rescheduleModal').classList.add('active');
+
+            // Set min date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('rescheduleDate').min = tomorrow.toISOString().split('T')[0];
+
+            // Set max date = 60 days out
+            const maxDate = new Date();
+            maxDate.setDate(maxDate.getDate() + 60);
+            document.getElementById('rescheduleDate').max = maxDate.toISOString().split('T')[0];
+
+            try {
+                // Fetch doctor list to get schedule info (cached after first call)
+                if (!allDoctors) {
+                    allDoctors = await getPatientDoctors();
+                }
+
+                const doctor = allDoctors.find(d => d.id == doctorId);
+                if (!doctor) throw new Error('Doctor not found');
+
+                // Store schedule in hidden fields
+                document.getElementById('rescheduleDoctorDay').value   = doctor.dayOfWeek  || '';
+                document.getElementById('rescheduleDoctorStart').value = doctor.startTime  || '';
+                document.getElementById('rescheduleDoctorEnd').value   = doctor.endTime    || '';
+
+                const dayLabel = doctor.dayOfWeek
+                    ? doctor.dayOfWeek.charAt(0) + doctor.dayOfWeek.slice(1).toLowerCase()
+                    : 'unknown';
+                const start = doctor.startTime ? doctor.startTime.substring(0,5) : '--';
+                const end   = doctor.endTime   ? doctor.endTime.substring(0,5)   : '--';
+
+                document.getElementById('rescheduleHint').textContent =
+                    'Dr. ' + (doctor.name || '') + ' works on ' + dayLabel + 's, ' + start + ' – ' + end + '.';
+                document.getElementById('dateHint').textContent =
+                    'Only ' + dayLabel + 's are valid.';
+
+            } catch (err) {
+                document.getElementById('rescheduleHint').textContent = 'Could not load schedule — any date allowed.';
+                showToast('Could not load doctor schedule: ' + err.message, 'error');
+            }
+        }
+
+        function closeRescheduleModal() {
+            document.getElementById('rescheduleModal').classList.remove('active');
+        }
+
+        async function onRescheduleDateChange() {
+            const dateInput  = document.getElementById('rescheduleDate');
+            const doctorDay  = document.getElementById('rescheduleDoctorDay').value.toUpperCase();
+            const doctorId   = document.getElementById('rescheduleDoctorId').value;
+            const startTime  = document.getElementById('rescheduleDoctorStart').value;
+            const endTime    = document.getElementById('rescheduleDoctorEnd').value;
+            const dateHint   = document.getElementById('dateHint');
+            const timeSelect = document.getElementById('rescheduleTime');
+
+            const selectedDate = dateInput.value;
+            if (!selectedDate) return;
+
+            // ── Validate that selected date matches doctor's working day ──
+            if (doctorDay && DAY_MAP[doctorDay] !== undefined) {
+                // new Date('YYYY-MM-DD') parses as UTC midnight; add time to avoid off-by-one
+                const parts = selectedDate.split('-').map(Number);
+                const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                const selectedDayNum = d.getDay();
+
+                if (selectedDayNum !== DAY_MAP[doctorDay]) {
+                    const dayLabel = doctorDay.charAt(0) + doctorDay.slice(1).toLowerCase();
+                    dateHint.textContent = '⚠ Doctor only works on ' + dayLabel + 's. Please pick another date.';
+                    dateHint.style.color = '#e74c3c';
+                    dateInput.value = '';
+                    timeSelect.innerHTML = '<option value="">— Invalid day —</option>';
+                    return;
+                } else {
+                    dateHint.textContent = '✓ Valid day.';
+                    dateHint.style.color = '#27ae60';
+                }
+            }
+
+            // ── Generate slots from doctor startTime to endTime ───────
+            timeSelect.innerHTML = '<option value="">Loading slots...</option>';
+            timeSelect.disabled  = true;
+
+            try {
+                // GET /api/appointments/booked-slots/{doctorId}
+                // Returns List<String> of already-booked times ("HH:mm:ss")
+                const bookedSlots = await getBookedSlots(doctorId, selectedDate);
+                const allSlots    = generateSlots(startTime, endTime);
+
+                timeSelect.innerHTML = '<option value="">— Select a time slot —</option>';
+
+                allSlots.forEach(slot => {
+                    const opt = document.createElement('option');
+                    opt.value = slot;
+                    opt.textContent = slot.substring(0, 5); // display HH:mm
+                    if (bookedSlots && bookedSlots.includes(slot)) {
+                        opt.disabled = true;
+                        opt.textContent += ' (booked)';
+                        opt.className = 'slot-disabled';
+                    }
+                    timeSelect.appendChild(opt);
+                });
+            } catch (err) {
+                timeSelect.innerHTML = '<option value="">Failed to load slots</option>';
+                showToast('Could not fetch available slots: ' + err.message, 'error');
+            } finally {
+                timeSelect.disabled = false;
+            }
+        }
+
+        /**
+         * Generate 30-minute slots between startTime and endTime.
+         * @param {string} startTime  "HH:mm" or "HH:mm:ss"
+         * @param {string} endTime    "HH:mm" or "HH:mm:ss"
+         * @returns {string[]} array of "HH:mm:ss" values
+         */
+        function generateSlots(startTime, endTime) {
+            const slots = [];
+            if (!startTime || !endTime) return slots;
+
+            const [sh, sm] = startTime.split(':').map(Number);
+            const [eh, em] = endTime.split(':').map(Number);
+
+            let cur = new Date(2000, 0, 1, sh, sm, 0);
+            const fin = new Date(2000, 0, 1, eh, em, 0);
+
+            // Handle overnight shifts where end time is the next day
+            if (fin <= cur) {
+                fin.setDate(fin.getDate() + 1);
+            }
+
+            while (cur < fin) {
+                const hh = String(cur.getHours()).padStart(2, '0');
+                const mm = String(cur.getMinutes()).padStart(2, '0');
+                slots.push(hh + ':' + mm + ':00');
+                cur.setMinutes(cur.getMinutes() + 30);
+            }
+            return slots;
+        }
+
+        async function submitReschedule(e) {
+            e.preventDefault();
+
+            const id   = document.getElementById('rescheduleApptId').value;
+            const date = document.getElementById('rescheduleDate').value;
+            const time = document.getElementById('rescheduleTime').value;
+
+            if (!date || !time) {
+                showToast('Please select both a date and a time slot.', 'error');
+                return;
+            }
+
+            const btn  = document.getElementById('rescheduleSubmitBtn');
+            const orig = btn.textContent;
+            btn.textContent = 'Processing...';
+            btn.disabled    = true;
+
+            try {
+                // PATCH /api/appointments/{id}/reschedule
+                // Body: AppointmentRequestDTO { appointmentDate, appointmentTime }
+                // Backend reads appointmentDate (LocalDate) + appointmentTime (LocalTime)
+                // time is already "HH:mm:ss" — correct for LocalTime parsing
+                await rescheduleAppointment(id, date, time);
+                showToast('Appointment rescheduled successfully!', 'success');
+                closeRescheduleModal();
+                loadAppointments();
+            } catch (err) {
+                showToast(err.message || 'Failed to reschedule', 'error');
+            } finally {
+                btn.textContent = orig;
+                btn.disabled    = false;
+            }
+        }
+
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAppointments);
+    </script>
+</body>
+</html>

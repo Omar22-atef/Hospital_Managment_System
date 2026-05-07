@@ -1,39 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book Appointment - HMS Care</title>
-
-    <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Hospital Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
 
 <!-- Navbar -->
 <nav class="navbar">
     <div class="navbar-brand">
-        🏥 HMS Care
+        MediCore
     </div>
-
     <div class="navbar-links">
-        <!-- Injected from ui.js -->
+        <!-- Populated by ui.js -->
     </div>
 </nav>
 
-<!-- Booking Container -->
+<!-- Book Appointment Section -->
 <div class="login-container fade-in">
 
-    <div class="card login-card" style="max-width: 550px;">
+    <div class="card login-card" style="max-width: 500px;">
 
         <div class="login-header">
             <h2>Book an Appointment</h2>
-
             <p style="color: var(--text-light);">
                 Schedule a visit with our expert doctors
             </p>
@@ -41,107 +33,85 @@
 
         <form id="bookAppointmentForm">
 
-            <!-- Doctor -->
             <div class="form-group">
-
                 <label class="form-label" for="doctorId">
                     Select Doctor
                 </label>
-
                 <select
                         id="doctorId"
                         class="form-control"
                         required
-                        style="cursor: pointer;"
+                        style="cursor: pointer; background-color: #fff;"
                 >
-                    <option value="">
-                        -- Choose a Doctor --
+                    <option value="" disabled selected>
+                        Loading doctors...
                     </option>
                 </select>
             </div>
 
-            <!-- Doctor Day -->
             <div class="form-group">
-
-                <label class="form-label">
+                <label class="form-label" for="doctorDay">
                     Doctor Working Day
                 </label>
-
                 <input
                         type="text"
                         id="doctorDay"
                         class="form-control"
-                        readonly
-                        placeholder="Select doctor first"
-                />
+                        disabled
+                        style="background-color: #f5f7fa;"
+                >
             </div>
 
-            <!-- Working Hours -->
             <div class="form-group">
-
-                <label class="form-label">
-                    Working Hours
+                <label class="form-label" for="doctorTime">
+                    Doctor Working Time
                 </label>
-
                 <input
                         type="text"
                         id="doctorTime"
                         class="form-control"
-                        readonly
-                        placeholder="Select doctor first"
-                />
+                        disabled
+                        style="background-color: #f5f7fa;"
+                >
             </div>
 
-            <!-- Appointment Date -->
             <div class="form-group">
-
-                <label
-                        class="form-label"
-                        for="appointmentDate"
-                >
+                <label class="form-label" for="appointmentDate">
                     Appointment Date
                 </label>
-
                 <input
                         type="date"
                         id="appointmentDate"
                         class="form-control"
                         required
-                />
+                >
             </div>
 
-            <!-- Time Slots -->
             <div class="form-group">
-
-                <label
-                        class="form-label"
-                        for="timeSlot"
-                >
+                <label class="form-label" for="timeSlot">
                     Available Time Slots
                 </label>
-
                 <select
                         id="timeSlot"
                         class="form-control"
                         required
-                        style="cursor: pointer;"
+                        style="cursor: pointer; background-color: #fff;"
                 >
-                    <option value="">
-                        -- Select Time Slot --
+                    <option value="" disabled selected>
+                        -- Select Date First --
                     </option>
                 </select>
             </div>
 
-            <!-- Submit -->
             <button
                     type="submit"
                     class="btn btn-primary"
+                    id="submitBtn"
                     style="width: 100%; margin-top: 1rem;"
             >
                 Confirm Booking
             </button>
 
-            <!-- Cancel -->
             <a
                     href="patient-dashboard.html"
                     class="btn btn-outline"
@@ -183,7 +153,7 @@
     const slotSelect =
         document.getElementById("timeSlot");
 
-    const appointmentDateInput =
+    let appointmentDateInput =
         document.getElementById("appointmentDate");
 
     let doctors = [];
@@ -216,8 +186,20 @@
                 option.textContent =
                     `${doctor.name} (${doctor.specialization})`;
 
+                // Preselect if coming from available-doctors.html
+                const urlParams = new URLSearchParams(window.location.search);
+                const preselectedDoctor = urlParams.get('doctor');
+                if (preselectedDoctor && preselectedDoctor == doctor.id) {
+                    option.selected = true;
+                }
+
                 doctorSelect.appendChild(option);
             });
+            
+            // Trigger change if preselected
+            if (doctorSelect.value) {
+                doctorSelect.dispatchEvent(new Event('change'));
+            }
 
         } catch (error) {
 
@@ -235,40 +217,29 @@
     */
 
     function generateSlots(startTime, endTime) {
-
         const slots = [];
 
-        let [startHour, startMinute] =
-            startTime.split(":").map(Number);
+        let [startHour, startMinute] = startTime.split(":").map(Number);
+        let [endHour, endMinute] = endTime.split(":").map(Number);
 
-        let [endHour, endMinute] =
-            endTime.split(":").map(Number);
+        let currentTotalMinutes = startHour * 60 + startMinute;
+        let endTotalMinutes = endHour * 60 + endMinute;
 
-        let current = new Date();
+        // Handle overnight shifts where end time is the next day
+        if (endTotalMinutes <= currentTotalMinutes) {
+            endTotalMinutes += 24 * 60;
+        }
 
-        current.setHours(startHour);
-        current.setMinutes(startMinute);
+        while (currentTotalMinutes < endTotalMinutes) {
+            let h = Math.floor(currentTotalMinutes / 60) % 24;
+            let m = currentTotalMinutes % 60;
 
-        let end = new Date();
+            const hours = String(h).padStart(2, "0");
+            const minutes = String(m).padStart(2, "0");
 
-        end.setHours(endHour);
-        end.setMinutes(endMinute);
+            slots.push(`${hours}:${minutes}:00`); // Ensure HH:mm:ss for backend
 
-        while (current < end) {
-
-            const hours =
-                String(current.getHours())
-                    .padStart(2, "0");
-
-            const minutes =
-                String(current.getMinutes())
-                    .padStart(2, "0");
-
-            slots.push(`${hours}:${minutes}`);
-
-            current.setMinutes(
-                current.getMinutes() + 30
-            );
+            currentTotalMinutes += 30;
         }
 
         return slots;
@@ -328,90 +299,78 @@
         ============================================
         */
 
-        const doctorDay =
-            doctor.dayOfWeek.toUpperCase();
-
+        const doctorDay = doctor.dayOfWeek.toUpperCase();
         const dayMap = {
-            SUNDAY: 0,
-            MONDAY: 1,
-            TUESDAY: 2,
-            WEDNESDAY: 3,
-            THURSDAY: 4,
-            FRIDAY: 5,
-            SATURDAY: 6
+            SUNDAY: 0, MONDAY: 1, TUESDAY: 2,
+            WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6
         };
+        const allowedDay = dayMap[doctorDay];
 
-        const allowedDay =
-            dayMap[doctorDay];
+        // Reset slots when doctor changes
+        slotSelect.innerHTML = '<option value="">-- Select Date First --</option>';
+        appointmentDateInput.value = '';
 
-        appointmentDateInput.addEventListener(
-            "input",
-            () => {
-
-                const selectedDate =
-                    new Date(appointmentDateInput.value);
-
-                if (
-                    selectedDate.getDay()
-                    !== allowedDay
-                ) {
-
-                    showToast(
-                        `Doctor is only available on ${doctorDay}`,
-                        "error"
-                    );
-
-                    appointmentDateInput.value = "";
-                }
-            }
-        );
+        // Remove any previously attached listener by cloning the element
+        const freshDateInput = appointmentDateInput.cloneNode(true);
+        appointmentDateInput.parentNode.replaceChild(freshDateInput, appointmentDateInput);
+        
+        // Update the module-level reference to the new active DOM node
+        appointmentDateInput = freshDateInput;
 
         /*
         ============================================
-        GET BOOKED SLOTS
+        DATE CHANGE → VALIDATE DAY + LOAD DATE-SCOPED SLOTS
         ============================================
         */
+        appointmentDateInput.addEventListener('change', async () => {
+            const selectedValue = appointmentDateInput.value;
+            if (!selectedValue) return;
 
-        try {
+            // Parse locally to avoid UTC-shift (new Date('YYYY-MM-DD') is UTC midnight)
+            const [y, m, d] = selectedValue.split('-').map(Number);
+            const localDate = new Date(y, m - 1, d);
 
-            const bookedSlots =
-                await apiFetch(
-                    `/api/appointments/booked-slots/${doctorId}`
-                );
+            if (localDate.getDay() !== allowedDay) {
+                const dayLabel = doctorDay.charAt(0) + doctorDay.slice(1).toLowerCase();
+                showToast('Doctor is only available on ' + dayLabel + 's', 'error');
+                dateInputEl.value = '';
+                slotSelect.innerHTML = '<option value="">-- Select Date First --</option>';
+                return;
+            }
 
-            const allSlots =
-                generateSlots(
-                    doctor.startTime,
-                    doctor.endTime
-                );
+            // Valid day — load booked slots for THIS doctor on THIS date
+            slotSelect.innerHTML = '<option value="">Loading slots...</option>';
+            slotSelect.disabled = true;
 
-            const availableSlots =
-                allSlots.filter(
-                    slot => !bookedSlots.includes(slot)
-                );
+            try {
+                // GET /api/appointments/booked-slots/{doctorId}?date=YYYY-MM-DD
+                const bookedSlots = await getBookedSlots(doctorId, selectedValue);
+                const allSlots    = generateSlots(doctor.startTime, doctor.endTime);
 
-            slotSelect.innerHTML =
-                `<option value="">-- Select Time Slot --</option>`;
+                slotSelect.innerHTML = '<option value="">-- Select Time Slot --</option>';
+                slotSelect.disabled  = false;
 
-            availableSlots.forEach((slot) => {
+                let hasAvailable = false;
+                allSlots.forEach(slot => {
+                    const isBooked = bookedSlots && bookedSlots.includes(slot);
+                    const option   = document.createElement('option');
+                    option.value   = slot;
+                    option.textContent = slot.substring(0, 5) + (isBooked ? ' (booked)' : '');
+                    option.disabled    = isBooked;
+                    if (isBooked) option.style.color = '#aaa';
+                    slotSelect.appendChild(option);
+                    if (!isBooked) hasAvailable = true;
+                });
 
-                const option =
-                    document.createElement("option");
-
-                option.value = slot;
-
-                option.textContent = slot;
-
-                slotSelect.appendChild(option);
-            });
-
-        } catch (error) {
-
-            showToast(
-                "Failed to load available slots",
-                "error"
-            );
-        }
+                if (!hasAvailable) {
+                    slotSelect.innerHTML = '<option value="">No slots available on this date</option>';
+                }
+            } catch (error) {
+                slotSelect.disabled = false;
+                slotSelect.innerHTML = '<option value="">Failed to load slots</option>';
+                showToast('Failed to load available slots', 'error');
+            }
+        });
     });
 
     /*
@@ -450,8 +409,38 @@
                 return;
             }
 
-            try {
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.textContent;
+            btn.textContent = "Checking availability...";
+            btn.disabled = true;
 
+            try {
+                // Duplicate booking prevention
+                const existingAppointments = await apiFetch('/api/patient/appointments');
+                if (existingAppointments && Array.isArray(existingAppointments)) {
+                    const hasDuplicate = existingAppointments.some(app => 
+                        app.doctorId == doctorId && 
+                        (app.appointmentDate === appointmentDate || app.date === appointmentDate) &&
+                        // AppointmentStatus enum: PENDING, CONFIRMED, CANCELLED, COMPLETED
+                        (app.status === 'PENDING' || app.status === 'CONFIRMED')
+                    );
+                    
+                    if (hasDuplicate) {
+                        showToast("You already have an appointment with this doctor on the selected date.", "error");
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+            } catch (err) {
+                // If it fails to fetch existing appointments, we will just proceed and let the backend decide
+                console.warn("Could not fetch existing appointments for duplicate check", err);
+            }
+
+            btn.textContent = "Booking...";
+
+            try {
+                // Must perfectly match AppointmentRequestDTO
                 await apiFetch(
                     "/api/appointments/book",
                     {
@@ -459,11 +448,11 @@
 
                         body: JSON.stringify({
 
-                            doctorId,
+                            doctorId: parseInt(doctorId),
 
-                            appointmentDate,
+                            appointmentDate: appointmentDate,
 
-                            appointmentTime
+                            appointmentTime: appointmentTime // HH:mm:ss format generated
                         })
                     }
                 );
@@ -487,6 +476,8 @@
                     "Booking failed",
                     "error"
                 );
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
         });
 
