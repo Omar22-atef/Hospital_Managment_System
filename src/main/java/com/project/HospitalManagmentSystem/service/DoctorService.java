@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
+import com.project.HospitalManagmentSystem.event.AppointmentCancelledEvent;
 import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.entity.Doctor;
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
@@ -14,19 +16,20 @@ import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.mapper.AppointmentMapper;
 import com.project.HospitalManagmentSystem.mapper.DoctorMapper;
 
+
 @Service
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher publisher;
 
     public DoctorService(DoctorRepository doctorRepository,
                          AppointmentRepository appointmentRepository,
-                         EmailService emailService) {
+                        ApplicationEventPublisher publisher) {
         this.doctorRepository = doctorRepository;
         this.appointmentRepository = appointmentRepository;
-        this.emailService = emailService;
+        this.publisher = publisher;
     }
 
     
@@ -76,9 +79,7 @@ public class DoctorService {
         appointmentRepository.save(appointment);
 
     
-        emailService.sendCancellationEmail(
-    appointment.getPatient().getEmail(),
-    appointment.getCancellationReason()
-);
+       publisher.publishEvent(
+     new AppointmentCancelledEvent(appointment));
     }
 }

@@ -77,6 +77,186 @@
         }
         .profile-info h3 { margin: 0 0 0.25rem; }
         .profile-info p  { margin: 0; color: var(--text-light); font-size: 0.9rem; }
+
+        html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+        /* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0,0,0,0.45);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    backdrop-filter: blur(4px);
+
+    overflow: hidden;
+}
+
+/* Show Modal */
+.modal-overlay.active {
+    display: flex;
+}
+
+/* Modal Box */
+.cancel-modal {
+
+    background: white;
+
+    width: 90%;
+    max-width: 500px;
+
+    border-radius: 24px;
+
+    padding: 2rem;
+
+    position: relative;
+
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+
+    animation: modalPop 0.25s ease;
+
+    margin: auto;
+}
+
+/* Animation */
+@keyframes modalPop {
+
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Title */
+.cancel-modal h2 {
+
+    color: var(--primary-color);
+
+    margin-bottom: 0.5rem;
+}
+
+/* Subtitle */
+.modal-text {
+
+    color: var(--text-light);
+
+    margin-bottom: 1rem;
+
+    font-size: 0.95rem;
+}
+
+/* Textarea */
+.cancel-modal textarea {
+
+    width: 100%;
+    min-height: 120px;
+
+    border: 2px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 1rem;
+
+    resize: vertical;
+
+    font-family: inherit;
+
+    font-size: 0.95rem;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+/* Focus */
+.cancel-modal textarea:focus {
+
+    border-color: var(--primary-color);
+
+    box-shadow: 0 0 0 4px rgba(30,136,168,0.15);
+}
+
+/* Send Button */
+.send-cancel-btn {
+
+    width: 100%;
+
+    margin-top: 1.2rem;
+
+    background: linear-gradient(
+        135deg,
+        #e74c3c,
+        #c0392b
+    );
+
+    color: white;
+
+    border: none;
+
+    padding: 1rem;
+
+    border-radius: 16px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* Hover */
+.send-cancel-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 20px rgba(231,76,60,0.25);
+}
+
+/* Close */
+.close-modal {
+
+    position: absolute;
+
+    top: 14px;
+    right: 18px;
+
+    border: none;
+    background: none;
+
+    font-size: 1.8rem;
+
+    cursor: pointer;
+
+    color: #999;
+}
+
+.close-modal:hover {
+    color: #333;
+}
     </style>
 </head>
 <body>
@@ -96,6 +276,8 @@
         <div class="dashboard-header">
             <h2>Doctor Dashboard</h2>
         </div>
+
+        
 
         <!-- Doctor Profile Card -->
         <div class="profile-card" id="doctorProfileCard">
@@ -130,6 +312,38 @@
             </div>
         </div>
     </div>
+    <!-- Cancel Modal -->
+<div class="modal-overlay" id="cancelModal">
+
+    <div class="cancel-modal">
+
+        <button class="close-modal"
+                onclick="closeCancelModal()">
+            &times;
+        </button>
+
+        <h2>Cancel Appointment</h2>
+
+        <p class="modal-text">
+            The patient will receive the cancellation reason by email.
+        </p>
+
+        <textarea
+            id="cancelReason"
+            placeholder="Write cancellation reason..."
+        ></textarea>
+
+        <button
+            class="send-cancel-btn"
+            id="sendCancelBtn"
+            onclick="submitCancellation()"
+        >
+            Send Cancellation
+        </button>
+
+    </div>
+
+</div>
 
     <!-- Scripts -->
     <script src="js/ui.js"></script>
@@ -160,26 +374,40 @@
         }
 
         async function handleStatusUpdate(id, newStatus) {
-            try {
-                if (newStatus === 'CANCELLED') {
-                    const reason = prompt('Please provide a reason for cancellation:');
-                    if (reason === null) return;
-                    if (!reason.trim()) {
-                        showToast('Cancellation reason is required.', 'error');
-                        return;
-                    }
-                    await updateAppointmentStatus(id, newStatus, reason.trim());
-                    showToast('Appointment cancelled and patient notified.', 'success');
-                } else {
-                    await updateAppointmentStatus(id, newStatus);
-                    const label = newStatus === 'CONFIRMED' ? 'confirmed' : 'completed';
-                    showToast(`Appointment ${label} successfully`, 'success');
-                }
-                loadAppointments();
-            } catch (error) {
-                showToast(error.message || `Failed to update appointment`, 'error');
-            }
+
+    try {
+
+        /* Open modal for cancellation */
+        if (newStatus === 'CANCELLED') {
+
+            openCancelModal(id);
+
+            return;
         }
+
+        /* Normal status updates */
+        await updateAppointmentStatus(id, newStatus);
+
+        const label =
+            newStatus === 'CONFIRMED'
+                ? 'confirmed'
+                : 'completed';
+
+        showToast(
+            `Appointment ${label} successfully`,
+            'success'
+        );
+
+        loadAppointments();
+
+    } catch (error) {
+
+        showToast(
+            error.message || 'Failed to update appointment',
+            'error'
+        );
+    }
+    }
 
         async function loadAppointments() {
             const tbody = document.getElementById('appointmentsBody');
@@ -231,11 +459,95 @@
                 showToast('Failed to load appointments', 'error');
             }
         }
+        let selectedAppointmentId = null;
+
+/* Open Modal */
+function openCancelModal(id) {
+
+    selectedAppointmentId = id;
+
+    document
+        .getElementById('cancelModal')
+        .classList.add('active');
+
+        document.body.style.overflow = 'hidden';
+
+    document
+        .getElementById('cancelReason')
+        .value = '';
+    
+}
+
+/* Close Modal */
+function closeCancelModal() {
+
+    document
+        .getElementById('cancelModal')
+        .classList.remove('active');
+
+    document.body.style.overflow = 'auto';
+}
+
+/* Submit */
+async function submitCancellation() {
+
+    const reason = document
+        .getElementById('cancelReason')
+        .value
+        .trim();
+
+    if (!reason) {
+
+        showToast(
+            'Cancellation reason is required.',
+            'error'
+        );
+
+        return;
+    }
+
+    const btn = document.getElementById('sendCancelBtn');
+
+    btn.disabled = true;
+    btn.innerText = 'Sending...';
+
+    try {
+
+        await updateAppointmentStatus(
+            selectedAppointmentId,
+            'CANCELLED',
+            reason
+        );
+
+        showToast(
+            'Appointment cancelled successfully',
+            'success'
+        );
+
+        closeCancelModal();
+
+        loadAppointments();
+
+    } catch (error) {
+
+        showToast(
+            error.message || 'Cancellation failed',
+            'error'
+        );
+
+    } finally {
+
+        btn.disabled = false;
+
+        btn.innerText = 'Send Cancellation';
+    }
+}
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDoctorProfile();
             loadAppointments();
         });
     </script>
+    
 </body>
 </html>

@@ -3,7 +3,7 @@ package com.project.HospitalManagmentSystem.mapper;
 import com.project.HospitalManagmentSystem.entity.Doctor;
 import com.project.HospitalManagmentSystem.dto.DoctorRequestDTO;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
-import org.mapstruct.Mapper;
+
 
 public interface DoctorMapper {
     public static Doctor toEntity(DoctorRequestDTO dto) {

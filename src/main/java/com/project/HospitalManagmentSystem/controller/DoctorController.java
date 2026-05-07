@@ -9,6 +9,8 @@ import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.DoctorResponseDTO;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
 import org.springframework.security.core.Authentication;
+import com.project.HospitalManagmentSystem.dto.CancelRequest;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -44,4 +46,23 @@ public ApiResponse<List<AppointmentResponseDTO>> getAppointments(Authentication 
             doctorService.getDoctorAppointmentsByEmail(email)
     );
 }
-}
+
+
+@PatchMapping("/appointments/{id}/cancel")
+public ResponseEntity<?> cancelAppointment(
+        @PathVariable Long id,
+        @RequestBody CancelRequest request,
+        Authentication authentication) {
+
+    String email = authentication.getName();
+
+    doctorService.cancelAppointment(
+            email,
+            id,
+            request.getCancelReason()
+    );
+
+    return ResponseEntity.ok(
+            new ApiResponse<>("Appointment cancelled successfully", null)
+    );
+}}

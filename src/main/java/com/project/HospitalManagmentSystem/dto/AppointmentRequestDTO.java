@@ -1,6 +1,6 @@
 package com.project.HospitalManagmentSystem.dto;
 
-import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

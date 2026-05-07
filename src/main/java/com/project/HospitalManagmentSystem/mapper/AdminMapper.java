@@ -3,7 +3,7 @@ package com.project.HospitalManagmentSystem.mapper;
 import com.project.HospitalManagmentSystem.entity.Admin;
 import com.project.HospitalManagmentSystem.dto.AdminRequestDTO;
 import com.project.HospitalManagmentSystem.dto.AdminResponseDTO;
-import org.mapstruct.Mapper;
+
 
 public interface AdminMapper {
     public static Admin toEntity(AdminRequestDTO dto) {

@@ -10,7 +10,7 @@ import com.project.HospitalManagmentSystem.dto.ApiResponse;
 import com.project.HospitalManagmentSystem.dto.CancelRequest;
 import com.project.HospitalManagmentSystem.dto.AppointmentRequestDTO;
 import java.time.LocalDate;
-import java.time.LocalTime;
+
 
 @RestController
 @RequestMapping("/api/appointments")

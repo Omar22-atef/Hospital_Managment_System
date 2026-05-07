@@ -4,8 +4,7 @@ import com.project.HospitalManagmentSystem.entity.Appointment;
 import com.project.HospitalManagmentSystem.dto.AppointmentRequestDTO;
 import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+
 
 public interface AppointmentMapper {
     public static Appointment toEntity(AppointmentRequestDTO dto) {
