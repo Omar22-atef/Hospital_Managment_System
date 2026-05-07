@@ -10,6 +10,7 @@ import com.project.HospitalManagmentSystem.dto.PatientResponseDTO;
 import com.project.HospitalManagmentSystem.repository.PatientRepository;
 import com.project.HospitalManagmentSystem.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class AdminFacadeService {
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
     private final com.project.HospitalManagmentSystem.repository.PaymentRepository paymentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // --- 1. Dashboard Logic ---
     public Map<String, Object> getDashboardData() {
@@ -47,7 +49,7 @@ public class AdminFacadeService {
         Doctor doctor = Doctor.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
-                .password(dto.getPassword())
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .specialization(dto.getSpecialization())
                 .phone(dto.getPhone())
                 .dayOfWeek(dto.getDayOfWeek())
