@@ -29,6 +29,7 @@ public interface AppointmentMapper {
                 .status(entity.getStatus())
                 .patientId(entity.getPatient().getId())
                 .doctorId(entity.getDoctor().getId())
+                .doctorName(entity.getDoctor().getName())
                 .build();
     }
 }

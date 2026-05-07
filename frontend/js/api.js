@@ -23,10 +23,8 @@ async function apiFetch(endpoint, options = {}) {
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-        // ✅ اقرأ كـ text مرة واحدة
         const raw = await response.text();
 
-        // ✅ حاول تحوله لـ JSON
         let data;
         try {
             data = raw ? JSON.parse(raw) : null;

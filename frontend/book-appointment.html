@@ -1,112 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - Hospital Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment - HMS Care</title>
+
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            🏥 HMS Care
-        </div>
-        <div class="navbar-links">
-            <!-- Populated by ui.js -->
-        </div>
-    </nav>
-
-    <!-- Book Appointment Section -->
-    <div class="login-container fade-in">
-        <div class="card login-card" style="max-width: 500px;">
-            <div class="login-header">
-                <h2>Book an Appointment</h2>
-                <p style="color: var(--text-light);">Schedule a visit with our expert doctors</p>
-            </div>
-            
-            <form id="bookAppointmentForm">
-                <div class="form-group">
-                    <label class="form-label" for="doctorId">Select Doctor</label>
-                    <select id="doctorId" class="form-control" required style="cursor: pointer; background-color: #fff;">
-                        <option value="" disabled selected>-- Choose a Doctor --</option>
-                        <option value="1">Dr. John Smith (Cardiology)</option>
-                        <option value="2">Dr. Sarah Johnson (Pediatrics)</option>
-                        <option value="3">Dr. Michael Brown (Neurology)</option>
-                        <option value="4">Dr. Emily Davis (General Practice)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="appointmentDate">Appointment Date</label>
-                    <input type="date" id="appointmentDate" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="time">Preferred Time</label>
-                    <input type="time" id="time" class="form-control" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Confirm Booking</button>
-                <a href="patient-dashboard.html" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem; display: block;">Cancel</a>
-            </form>
-        </div>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        🏥 HMS Care
     </div>
 
-    <!-- Scripts -->
-    <script src="js/ui.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/appointments.js"></script>
+    <div class="navbar-links">
+        <!-- Injected from ui.js -->
+    </div>
+</nav>
 
-    <script>
-        // Require Authentication
-        requireAuth();
+<!-- Booking Container -->
+<div class="login-container fade-in">
 
-        // Prevent setting past dates
-        document.addEventListener('DOMContentLoaded', () => {
-            const dateInput = document.getElementById('appointmentDate');
-            if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
+    <div class="card login-card" style="max-width: 550px;">
+
+        <div class="login-header">
+            <h2>Book an Appointment</h2>
+
+            <p style="color: var(--text-light);">
+                Schedule a visit with our expert doctors
+            </p>
+        </div>
+
+        <form id="bookAppointmentForm">
+
+            <!-- Doctor -->
+            <div class="form-group">
+
+                <label class="form-label" for="doctorId">
+                    Select Doctor
+                </label>
+
+                <select
+                        id="doctorId"
+                        class="form-control"
+                        required
+                        style="cursor: pointer;"
+                >
+                    <option value="">
+                        -- Choose a Doctor --
+                    </option>
+                </select>
+            </div>
+
+            <!-- Doctor Day -->
+            <div class="form-group">
+
+                <label class="form-label">
+                    Doctor Working Day
+                </label>
+
+                <input
+                        type="text"
+                        id="doctorDay"
+                        class="form-control"
+                        readonly
+                        placeholder="Select doctor first"
+                />
+            </div>
+
+            <!-- Working Hours -->
+            <div class="form-group">
+
+                <label class="form-label">
+                    Working Hours
+                </label>
+
+                <input
+                        type="text"
+                        id="doctorTime"
+                        class="form-control"
+                        readonly
+                        placeholder="Select doctor first"
+                />
+            </div>
+
+            <!-- Appointment Date -->
+            <div class="form-group">
+
+                <label
+                        class="form-label"
+                        for="appointmentDate"
+                >
+                    Appointment Date
+                </label>
+
+                <input
+                        type="date"
+                        id="appointmentDate"
+                        class="form-control"
+                        required
+                />
+            </div>
+
+            <!-- Time Slots -->
+            <div class="form-group">
+
+                <label
+                        class="form-label"
+                        for="timeSlot"
+                >
+                    Available Time Slots
+                </label>
+
+                <select
+                        id="timeSlot"
+                        class="form-control"
+                        required
+                        style="cursor: pointer;"
+                >
+                    <option value="">
+                        -- Select Time Slot --
+                    </option>
+                </select>
+            </div>
+
+            <!-- Submit -->
+            <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="width: 100%; margin-top: 1rem;"
+            >
+                Confirm Booking
+            </button>
+
+            <!-- Cancel -->
+            <a
+                    href="patient-dashboard.html"
+                    class="btn btn-outline"
+                    style="
+                        width: 100%;
+                        margin-top: 0.7rem;
+                        display: block;
+                        text-align: center;
+                    "
+            >
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/appointments.js"></script>
+
+<script>
+
+    requireAuth();
+
+    const doctorSelect =
+        document.getElementById("doctorId");
+
+    const doctorDayInput =
+        document.getElementById("doctorDay");
+
+    const doctorTimeInput =
+        document.getElementById("doctorTime");
+
+    const slotSelect =
+        document.getElementById("timeSlot");
+
+    const appointmentDateInput =
+        document.getElementById("appointmentDate");
+
+    let doctors = [];
+
+    /*
+    ============================================
+    LOAD DOCTORS
+    ============================================
+    */
+
+    async function loadDoctors() {
+
+        try {
+
+            const response =
+                await apiFetch("/api/patient/doctors");
+
+            doctors = response.data || response;
+
+            doctorSelect.innerHTML =
+                `<option value="">-- Choose a Doctor --</option>`;
+
+            doctors.forEach((doctor) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = doctor.id;
+
+                option.textContent =
+                    `${doctor.name} (${doctor.specialization})`;
+
+                doctorSelect.appendChild(option);
+            });
+
+        } catch (error) {
+
+            showToast(
+                error.message || "Failed to load doctors",
+                "error"
+            );
+        }
+    }
+
+    /*
+    ============================================
+    GENERATE 30 MINUTE SLOTS
+    ============================================
+    */
+
+    function generateSlots(startTime, endTime) {
+
+        const slots = [];
+
+        let [startHour, startMinute] =
+            startTime.split(":").map(Number);
+
+        let [endHour, endMinute] =
+            endTime.split(":").map(Number);
+
+        let current = new Date();
+
+        current.setHours(startHour);
+        current.setMinutes(startMinute);
+
+        let end = new Date();
+
+        end.setHours(endHour);
+        end.setMinutes(endMinute);
+
+        while (current < end) {
+
+            const hours =
+                String(current.getHours())
+                    .padStart(2, "0");
+
+            const minutes =
+                String(current.getMinutes())
+                    .padStart(2, "0");
+
+            slots.push(`${hours}:${minutes}`);
+
+            current.setMinutes(
+                current.getMinutes() + 30
+            );
+        }
+
+        return slots;
+    }
+
+    /*
+    ============================================
+    WHEN DOCTOR CHANGES
+    ============================================
+    */
+
+    doctorSelect.addEventListener("change", async () => {
+
+        const doctorId = doctorSelect.value;
+
+        if (!doctorId) return;
+
+        const doctor =
+            doctors.find(d => d.id == doctorId);
+
+        if (!doctor) return;
+
+        /*
+        Expected Backend Fields:
+        workingDay
+        startTime
+        endTime
+        */
+
+        doctorDayInput.value =
+            doctor.dayOfWeek;
+
+        doctorTimeInput.value =
+            `${doctor.startTime} - ${doctor.endTime}`;
+
+        /*
+        ============================================
+        ALLOW ONLY NEXT 7 DAYS
+        ============================================
+        */
+
+        const today = new Date();
+
+        const nextWeek = new Date();
+
+        nextWeek.setDate(today.getDate() + 7);
+
+        appointmentDateInput.min =
+            today.toISOString().split("T")[0];
+
+        appointmentDateInput.max =
+            nextWeek.toISOString().split("T")[0];
+
+        /*
+        ============================================
+        ALLOW ONLY DOCTOR WORKING DAY
+        ============================================
+        */
+
+        const doctorDay =
+            doctor.dayOfWeek.toUpperCase();
+
+        const dayMap = {
+            SUNDAY: 0,
+            MONDAY: 1,
+            TUESDAY: 2,
+            WEDNESDAY: 3,
+            THURSDAY: 4,
+            FRIDAY: 5,
+            SATURDAY: 6
+        };
+
+        const allowedDay =
+            dayMap[doctorDay];
+
+        appointmentDateInput.addEventListener(
+            "input",
+            () => {
+
+                const selectedDate =
+                    new Date(appointmentDateInput.value);
+
+                if (
+                    selectedDate.getDay()
+                    !== allowedDay
+                ) {
+
+                    showToast(
+                        `Doctor is only available on ${doctorDay}`,
+                        "error"
+                    );
+
+                    appointmentDateInput.value = "";
+                }
             }
-        });
+        );
 
-        document.getElementById('bookAppointmentForm').addEventListener('submit', async (e) => {
+        /*
+        ============================================
+        GET BOOKED SLOTS
+        ============================================
+        */
+
+        try {
+
+            const bookedSlots =
+                await apiFetch(
+                    `/api/appointments/booked-slots/${doctorId}`
+                );
+
+            const allSlots =
+                generateSlots(
+                    doctor.startTime,
+                    doctor.endTime
+                );
+
+            const availableSlots =
+                allSlots.filter(
+                    slot => !bookedSlots.includes(slot)
+                );
+
+            slotSelect.innerHTML =
+                `<option value="">-- Select Time Slot --</option>`;
+
+            availableSlots.forEach((slot) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = slot;
+
+                option.textContent = slot;
+
+                slotSelect.appendChild(option);
+            });
+
+        } catch (error) {
+
+            showToast(
+                "Failed to load available slots",
+                "error"
+            );
+        }
+    });
+
+    /*
+    ============================================
+    BOOK APPOINTMENT
+    ============================================
+    */
+
+    document
+        .getElementById("bookAppointmentForm")
+        .addEventListener("submit", async (e) => {
+
             e.preventDefault();
 
-            const doctorId = document.getElementById('doctorId').value;
-            const appointmentDate = document.getElementById('appointmentDate').value;
-            const time = document.getElementById('time').value;
+            const doctorId =
+                doctorSelect.value;
 
-            if (!doctorId || !appointmentDate || !time) {
-                showToast("Please fill in all details.", "error");
+            const appointmentDate =
+                appointmentDateInput.value;
+
+            const appointmentTime =
+                slotSelect.value;
+
+
+            if (
+                !doctorId ||
+                !appointmentDate ||
+                !appointmentTime
+            ) {
+
+                showToast(
+                    "Please complete all fields",
+                    "error"
+                );
+
                 return;
             }
 
             try {
-                // The backend API might expect `date` instead of `appointmentDate` depending on the entity mapping, 
-                // but we will send both to be safe or what was conventionally used.
-                await bookAppointment({ doctorId, appointmentDate, date: appointmentDate, time });
-                
-                showToast("Appointment booked successfully!", "success");
 
-                // Redirect to dashboard after short delay
-                setTimeout(() => {
-                    const role = localStorage.getItem('role');
-                    if (role && role.toUpperCase() === 'PATIENT') {
-                        window.location.href = 'patient-dashboard.html';
-                    } else {
-                        window.location.href = 'index.html';
+                await apiFetch(
+                    "/api/appointments/book",
+                    {
+                        method: "POST",
+
+                        body: JSON.stringify({
+
+                            doctorId,
+
+                            appointmentDate,
+
+                            appointmentTime
+                        })
                     }
+                );
+
+                showToast(
+                    "Appointment booked successfully",
+                    "success"
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "patient-dashboard.html";
+
                 }, 1500);
 
             } catch (error) {
-                showToast(error.message || "Failed to book appointment", "error");
+
+                showToast(
+                    error.message ||
+                    "Booking failed",
+                    "error"
+                );
             }
         });
-    </script>
+
+    /*
+    ============================================
+    INIT
+    ============================================
+    */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            loadDoctors();
+        }
+    );
+
+</script>
+
 </body>
 </html>

@@ -23,7 +23,7 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('DOCTOR')")
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<?> cancelAppointment(@PathVariable Long id,
                                                @RequestBody CancelRequest request) {
@@ -105,6 +105,15 @@ public class AppointmentController {
 
         return ResponseEntity.ok().body(
                 new ApiResponse<>("Your appointment has been cancelled", id)
+        );
+    }
+
+    @PreAuthorize("hasRole('PATIENT')")
+    @GetMapping("/booked-slots/{doctorId}")
+    public ResponseEntity<?> getBookedSlots(@PathVariable Long doctorId) {
+
+        return ResponseEntity.ok(
+                appointmentService.getBookedSlots(doctorId)
         );
     }
 }

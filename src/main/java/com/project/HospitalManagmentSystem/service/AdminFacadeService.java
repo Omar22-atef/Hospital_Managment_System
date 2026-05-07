@@ -1,5 +1,6 @@
 package com.project.HospitalManagmentSystem.service;
 
+import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
 import com.project.HospitalManagmentSystem.repository.*;
 
 import com.project.HospitalManagmentSystem.entity.Doctor;
@@ -58,6 +59,19 @@ public class AdminFacadeService {
                 .build();
 
         return mapToDoctorResponse(doctorRepository.save(doctor));
+    }
+
+    public List<AppointmentResponseDTO> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map(a -> AppointmentResponseDTO.builder()
+                        .id(a.getId())
+                        .appointmentDate(a.getAppointmentDate())
+                        .appointmentTime(a.getAppointmentTime())
+                        .status(a.getStatus())
+                        .patientId(a.getPatient().getId())
+                        .doctorId(a.getDoctor().getId())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public DoctorResponseDTO updateDoctor(Long id, DoctorRequestDTO dto) {

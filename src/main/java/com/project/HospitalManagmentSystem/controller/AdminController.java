@@ -28,6 +28,12 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse<>("success", adminFacade.getAllDoctors()));
     }
 
+    @GetMapping("/appointments")
+    public ResponseEntity<ApiResponse<List<AppointmentResponseDTO>>> getAllAppointments()
+    {
+        return ResponseEntity.ok(new ApiResponse<>("success", adminFacade.getAllAppointments()));
+    }
+
     // POST /api/admin/doctors (Create)
     @PostMapping("/doctors")
     public ResponseEntity<ApiResponse<DoctorResponseDTO>> createDoctor(@RequestBody DoctorRequestDTO dto) {

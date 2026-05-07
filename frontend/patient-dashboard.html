@@ -89,41 +89,106 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/appointments.js"></script>
-    
+
     <script>
         // Require Authentication
         requireAuth();
 
         document.addEventListener('DOMContentLoaded', async () => {
+
             const tbody = document.getElementById('appointmentsBody');
+
             try {
+
                 const appointments = await getAppointments();
-                
+
                 if (!appointments || appointments.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No appointments found.</td></tr>';
+
+                    tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center;">
+                            No appointments found.
+                        </td>
+                    </tr>
+                `;
+
                     return;
                 }
 
                 tbody.innerHTML = '';
+
                 appointments.forEach(app => {
-                    // Determine badge class
+
+                    // Status Style
                     let statusClass = 'status-pending';
+
                     const status = (app.status || 'PENDING').toUpperCase();
-                    if (status === 'APPROVED' || status === 'CONFIRMED') statusClass = 'status-approved';
-                    else if (status === 'REJECTED' || status === 'CANCELLED') statusClass = 'status-rejected';
+
+                    if (status === 'APPROVED' || status === 'CONFIRMED') {
+                        statusClass = 'status-approved';
+                    }
+                    else if (status === 'REJECTED' || status === 'CANCELLED') {
+                        statusClass = 'status-rejected';
+                    }
+
+                    // Doctor Name
+                    const doctorName =
+                        app.doctorName ||
+                        app.doctor?.name ||
+                        app.doctor?.fullName ||
+                        '-';
+
+                    // Date
+                    const appointmentDate =
+                        app.appointmentDate ||
+                        app.date ||
+                        '-';
+
+                    // Time
+                    const appointmentTime =
+                        app.appointmentTime ||
+                        app.time ||
+                        '-';
 
                     const tr = document.createElement('tr');
+
                     tr.innerHTML = `
-                        <td>#${app.id || '-'}</td>
-                        <td>${app.doctorName || 'Dr. Smith'}</td>
-                        <td>${app.appointmentDate || app.date || '-'}</td>
-                        <td>${app.time || '-'}</td>
-                        <td><span class="status-badge ${statusClass}">${status}</span></td>
-                    `;
+                    <td>#${app.id || '-'}</td>
+
+                    <td>
+                        ${doctorName}
+                    </td>
+
+                    <td>
+                        ${appointmentDate}
+                    </td>
+
+                    <td>
+                        ${appointmentTime}
+                    </td>
+
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${status}
+                        </span>
+                    </td>
+                `;
+
                     tbody.appendChild(tr);
                 });
+
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Failed to load appointments: ${error.message}</td></tr>`;
+
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="5"
+                        style="text-align:center; color:red;">
+                        Failed to load appointments:
+                        ${error.message}
+                    </td>
+                </tr>
+            `;
+
                 showToast("Failed to load appointments", "error");
             }
         });

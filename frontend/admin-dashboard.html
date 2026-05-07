@@ -116,7 +116,7 @@
                         <td>${app.patientName || app.patientEmail || 'Patient'}</td>
                         <td>${app.doctorName || app.doctorEmail || 'Doctor'}</td>
                         <td>${app.appointmentDate || app.date || '-'}</td>
-                        <td>${app.time || '-'}</td>
+                        <td>${app.appointmentTime || app.time || '-'}</td>
                         <td><span class="status-badge ${statusClass}">${status}</span></td>
                     `;
                     tbody.appendChild(tr);

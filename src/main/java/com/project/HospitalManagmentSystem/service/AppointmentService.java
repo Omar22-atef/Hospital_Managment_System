@@ -14,6 +14,7 @@ import com.project.HospitalManagmentSystem.dto.AppointmentRequestDTO;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -112,6 +113,7 @@ public class AppointmentService {
                 .doctor(doctor)
                 .appointmentDate(dto.getAppointmentDate())
                 .appointmentTime(dto.getAppointmentTime())
+                .status(AppointmentStatus.PENDING)
                 .build();
 
         appointmentRepository.save(appointment);
@@ -147,5 +149,17 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    public List<String> getBookedSlots(Long doctorId) {
 
+        List<Appointment> appointments =
+                appointmentRepository
+                        .findByDoctorIdAndStatusNot(
+                                doctorId,
+                                AppointmentStatus.CANCELLED
+                        );
+
+        return appointments.stream()
+                .map(a -> a.getAppointmentTime().toString())
+                .toList();
+    }
 }

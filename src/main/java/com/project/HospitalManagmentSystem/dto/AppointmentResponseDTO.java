@@ -1,10 +1,7 @@
 package com.project.HospitalManagmentSystem.dto;
 
 import com.project.HospitalManagmentSystem.enums.AppointmentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +11,8 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 public class AppointmentResponseDTO {
     private Long id;
     private LocalDate appointmentDate;
@@ -21,4 +20,5 @@ public class AppointmentResponseDTO {
     private AppointmentStatus status;
     private Long patientId;
     private Long doctorId;
+    private String doctorName;
 }

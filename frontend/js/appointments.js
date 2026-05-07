@@ -32,8 +32,8 @@ async function getAppointments() {
     let endpoint = '/api/appointments';
 
     if (role === 'PATIENT') endpoint = '/api/patient/appointments';
-    else if (role === 'DOCTOR') endpoint = '/api/appointments/doctor';
-    else if (role === 'ADMIN') endpoint = '/api/appointments';
+    else if (role === 'DOCTOR') endpoint = '/api/doctor/appointments';
+    else if (role === 'ADMIN') endpoint = '/api/admin/appointments';
 
     return await apiFetch(endpoint);
 }

@@ -28,12 +28,12 @@ public class DataInitializer {
         if (adminRepository.count() == 0) {
             Admin admin = Admin.builder()
                     .name("Super Admin")
-                    .email("")
+                    .email("admin@gmail.com")
                     .password(passwordEncoder.encode("123456"))
                     .build();
 
             adminRepository.save(admin);
-            System.out.println("✅ Admin created!");
+            System.out.println("Admin created!");
         }
 
         // ── Seed Doctors manually ───────────────────────────────────
@@ -77,7 +77,7 @@ public class DataInitializer {
             );
 
             doctorRepository.saveAll(doctors);
-            System.out.println("✅ " + doctors.size() + " Doctors created!");
+            System.out.println("success " + doctors.size() + " Doctors created!");
         }
     }
 }

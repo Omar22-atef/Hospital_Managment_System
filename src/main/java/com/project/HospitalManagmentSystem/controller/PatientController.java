@@ -1,9 +1,7 @@
 package com.project.HospitalManagmentSystem.controller;
 
-import com.project.HospitalManagmentSystem.dto.AppointmentResponseDTO;
-import com.project.HospitalManagmentSystem.dto.PatientResponseDTO;
-import com.project.HospitalManagmentSystem.dto.PatientUpdateRequestDTO;
-import com.project.HospitalManagmentSystem.dto.PaymentResponseDTO;
+import com.project.HospitalManagmentSystem.dto.*;
+import com.project.HospitalManagmentSystem.service.AdminFacadeService;
 import com.project.HospitalManagmentSystem.serviceInterfaces.PatientAppointmentService;
 import com.project.HospitalManagmentSystem.serviceInterfaces.PatientPaymentService;
 import com.project.HospitalManagmentSystem.serviceInterfaces.PatientProfileService;
@@ -23,6 +21,7 @@ public class PatientController {
     private final PatientProfileService profileService;
     private final PatientAppointmentService appointmentService;
     private final PatientPaymentService paymentService;
+    private final AdminFacadeService adminFacade;
 
     // Get my profile
     @GetMapping("/me")
@@ -39,6 +38,11 @@ public class PatientController {
 
         String email = authentication.getName();
         return ResponseEntity.ok(profileService.updatePatientByEmail(email, dto));
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<ApiResponse<List<DoctorResponseDTO>>> getAllDoctors() {
+        return ResponseEntity.ok(new ApiResponse<>("success", adminFacade.getAllDoctors()));
     }
 
     // Get my appointments
