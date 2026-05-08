@@ -5,6 +5,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.project.HospitalManagmentSystem.entity.Payment;
+
 @Service
 public class EmailService {
 
@@ -43,4 +45,42 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    
+    public void sendReservationConfirmationEmail(Payment payment) {
+
+    SimpleMailMessage message = new SimpleMailMessage();
+
+    message.setTo(
+        payment.getAppointment().getPatient().getEmail()
+    );
+
+    message.setSubject("Appointment Reservation Confirmed");
+
+    message.setText(
+            "Dear " +
+            payment.getAppointment().getPatient().getName() +
+            ",\n\n" +
+
+            "Your payment was completed successfully.\n\n" +
+
+            "Appointment Details:\n" +
+            "Doctor: Dr. " +
+            payment.getAppointment().getDoctor().getName() +
+            "\n" +
+
+            "Date: " +
+            payment.getAppointment().getAppointmentDate() +
+            "\n" +
+
+            "Time: " +
+            payment.getAppointment().getAppointmentTime() +
+            "\n\n" +
+
+            "Thank you for choosing our hospital.\n\n" +
+
+            "Hospital Management System"
+    );
+
+    mailSender.send(message);
+}
 }

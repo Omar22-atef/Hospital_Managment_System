@@ -17,12 +17,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
+import com.project.HospitalManagmentSystem.event.PaymentCompletedEvent;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final AppointmentRepository appointmentRepository;
+    private final ApplicationEventPublisher publisher;
 
     private static final String STRIPE_SECRET_KEY =
             "sk_test_51TSiJ0Q5CVl6R8ElZb3hHeFtozP1lwxw9XIcQeNsLBIg0nAb06rkzBwKMDnY5WVlBE9psWX4coWKUvDwcCzbv2i300Mb5jzS8B";
@@ -81,7 +84,14 @@ public class PaymentService {
                     .build();
         }
 
-        return mapToResponse(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+
+        publisher.publishEvent(
+        new PaymentCompletedEvent(savedPayment)
+        );
+
+        return mapToResponse(savedPayment);
+
     }
 
     public List<PaymentResponseDTO> getAllPayments() {
