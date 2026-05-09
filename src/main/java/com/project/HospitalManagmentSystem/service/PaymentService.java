@@ -1,4 +1,6 @@
-package com.project.HospitalManagmentSystem.service;
+package com.project.HospitalManagmentSystem.service;import com.project.HospitalManagmentSystem.serviceInterfaces.PaymentProcessor;
+import com.project.HospitalManagmentSystem.Payment.PaymentFactory;
+import com.project.HospitalManagmentSystem.entity.Payment;
 import com.project.HospitalManagmentSystem.enums.PaymentStatus;
 import com.project.HospitalManagmentSystem.enums.PaymentMethod;
 import java.util.Map;
@@ -27,73 +29,26 @@ public class PaymentService {
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher publisher;
 
-    private static final String STRIPE_SECRET_KEY =
-            "sk_test_51TSiJ0Q5CVl6R8ElZb3hHeFtozP1lwxw9XIcQeNsLBIg0nAb06rkzBwKMDnY5WVlBE9psWX4coWKUvDwcCzbv2i300Mb5jzS8B";
 
+    // Inside PaymentService.java
     public PaymentResponseDTO createPayment(PaymentRequestDTO request) {
-
-        // Look up the appointment to derive the consultation fee from the doctor
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        // The amount is the doctor's consultation fee — NOT supplied by the client
         BigDecimal amount = appointment.getDoctor().getConsultationFee();
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Doctor consultation fee is not configured");
-        }
 
-        Payment payment;
+        // 1. Get the right processor from the Factory
+        PaymentProcessor processor = PaymentFactory.getProcessor(request.getPaymentMethod());
 
-        if (request.getPaymentMethod() == PaymentMethod.CREDIT_CARD) {
-            // ── Stripe credit card charge ──────────────────────────────
-            Stripe.apiKey = STRIPE_SECRET_KEY;
+        // 2. Process the payment logic (Stripe or Cash)
+        Payment payment = processor.process(amount, request, appointment);
 
-            if (request.getStripeToken() == null || request.getStripeToken().isBlank()) {
-                throw new RuntimeException("Stripe token is required for credit card payments");
-            }
-
-            try {
-                Map<String, Object> params = new HashMap<>();
-                // Stripe uses integer cents: $10.00 → 1000
-                params.put("amount", amount.multiply(new BigDecimal(100)).intValue());
-                params.put("currency", "usd");
-                params.put("description", "Hospital Consultation – Appointment #" + request.getAppointmentId());
-                params.put("source", request.getStripeToken());
-
-                Charge charge = Charge.create(params);
-
-                payment = Payment.builder()
-                        .amount(amount)
-                        .paymentStatus(PaymentStatus.PAID)
-                        .paymentMethod(PaymentMethod.CREDIT_CARD)
-                        .stripePaymentId(charge.getId())
-                        .appointment(appointment)
-                        .build();
-
-            } catch (StripeException e) {
-                throw new RuntimeException("Stripe Payment Failed: " + e.getMessage());
-            }
-
-        } else {
-            // ── Cash payment — record immediately as PAID ──────────────
-            payment = Payment.builder()
-                    .amount(amount)
-                    .paymentStatus(PaymentStatus.PAID)
-                    .paymentMethod(PaymentMethod.CASH)
-                    .appointment(appointment)
-                    .build();
-        }
-
+        // 3. Save and Publish
         Payment savedPayment = paymentRepository.save(payment);
-
-        publisher.publishEvent(
-        new PaymentCompletedEvent(savedPayment)
-        );
+        publisher.publishEvent(new PaymentCompletedEvent(savedPayment));
 
         return mapToResponse(savedPayment);
-
     }
-
     public List<PaymentResponseDTO> getAllPayments() {
         return paymentRepository.findAll().stream()
                 .map(this::mapToResponse)
