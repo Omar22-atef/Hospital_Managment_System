@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.math.BigDecimal;
 
 public class CreditCardProcessor implements PaymentProcessor {
-    private static final String STRIPE_SECRET_KEY = "sk_test_51TSiJ0Q5...";
+    private static final String STRIPE_SECRET_KEY = "sk_test_51TSiJ0Q5CVl6R8ElZb3hHeFtozP1lwxw9XIcQeNsLBIg0nAb06rkzBwKMDnY5WVlBE9psWX4coWKUvDwcCzbv2i300Mb5jzS8B";
 
     @Override
     public Payment process(BigDecimal amount, PaymentRequestDTO request, Appointment appointment) {
