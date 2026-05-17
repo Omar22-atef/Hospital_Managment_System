@@ -10,7 +10,7 @@
 # 🏥 Hospital Management System
 
 ## 📖 Project Overview
-The **Hospital Management System** is a robust, full-stack enterprise web application designed to streamline healthcare facility operations. It provides a seamless experience for patients, doctors, and administrators by bridging the gap between appointment scheduling, medical records management, and billing. 
+The **Hospital Management System** is a robust, full-stack enterprise web application designed to streamline healthcare facility operations. It provides a seamless experience for patients, doctors, and administrators by bridging the gap between appointment scheduling, medical records management, and billing.
 
 **Main Purpose and Features:**
 - 👨‍⚕️ **Role-Based Dashboards**: Tailored portals for Patients, Doctors, and Administrators.
@@ -81,11 +81,11 @@ Follow these steps to get the project running on your local machine.
 1. Navigate to the `frontend/` directory.
 2. Open `index.html` directly in your browser, or for the best experience, run a local web server (e.g., using VS Code's "Live Server" extension).
    ```bash
-   # If using Python 3 to serve locally:
+   # If using node.js to serve locally:
    cd frontend
-   python -m http.server 5500
+   npx serve frontend
    ```
-   *The frontend will be available at `http://localhost:5500`.*
+   *The frontend will be available at `http://localhost:3000`.*
 
 ---
 
@@ -111,10 +111,11 @@ Follow these steps to get the project running on your local machine.
 
 | Name | Role | GitHub Profile |
 | :--- | :--- | :--- |
-| **[Placeholder Name 1]** | Lead Backend Developer / Architect | [@github_handle_1](https://github.com/placeholder1) |
-| **[Placeholder Name 2]** | Frontend Developer / UI-UX | [@github_handle_2](https://github.com/placeholder2) |
-| **[Placeholder Name 3]** | Database Admin / QA | [@github_handle_3](https://github.com/placeholder3) |
-| **[Placeholder Name 4]** | DevOps / Scrum Master | [@github_handle_4](https://github.com/placeholder4) |
+| **[Omar Atef]** | Making Patient Module and Frontend | [@Omar22-atef](https://github.com/Omar22-atef) |
+| **[Ahmed Essam]** | Authentication and Security Module | [@Essam66777](https://github.com/Essam66777) |
+| **[Khaled Mohamed]** | Making Doctor Module | [@Khalidm0](https://github.com/Khalidm0) |
+| **[Mahmoud Khaled]** | Making Admin And Paayment Module | [@mahmoudkhaled2005](https://github.com/mahmoudkhaled2005) |
+| **[Abdulrahman Mohamed]** | Making Appointment Module | [@Abdulrahman-Albaiti](https://github.com/Abdulrahman-Albaiti) |
 
 ---
 
@@ -146,5 +147,5 @@ This project was developed using Agile methodologies and strict version control 
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details. 
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 *Academic Honesty Note: This repository was created for educational purposes.*
