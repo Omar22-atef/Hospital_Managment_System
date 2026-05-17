@@ -117,16 +117,6 @@ Follow these steps to get the project running on your local machine.
 | **[Mahmoud Khaled]** | Making Admin And Paayment Module | [@mahmoudkhaled2005](https://github.com/mahmoudkhaled2005) |
 | **[Abdulrahman Mohamed]** | Making Appointment Module | [@Abdulrahman-Albaiti](https://github.com/Abdulrahman-Albaiti) |
 
----
-
-## 🤝 Collaboration History & Workflow
-
-This project was developed using Agile methodologies and strict version control practices:
-- **Branching Strategy:** We followed a simplified **Git Flow**. `main` branch was strictly reserved for production-ready code. Features were developed on isolated `feature/feature-name` branches, while bug fixes utilized `bugfix/issue-name` branches.
-- **Pull Requests (PRs) & Code Reviews:** All code was merged into `main` via Pull Requests. PRs required at least one peer review to ensure code quality, security standards, and architectural consistency before merging.
-- **Commit Practices:** We utilized semantic commit messages (e.g., `feat: added Stripe payment gateway`, `fix: corrected UTC offset in appointment slots`) to maintain a readable and organized project history.
-
----
 
 ## 🌟 GitHub Best Practices Applied
 
