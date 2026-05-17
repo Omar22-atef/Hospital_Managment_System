@@ -56,18 +56,17 @@ Follow these steps to get the project running on your local machine.
 ### Environment Setup (Backend)
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/[YOUR-USERNAME]/Hospital_Managment_System.git
+   git clone https://github.com/Omar22-atef/Hospital_Managment_System.git
    cd Hospital_Managment_System
    ```
 2. **Configure the Database & Secrets:**
    Open `src/main/resources/application.properties` and update your MySQL credentials and Stripe API keys:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/hospital_db
+   spring.datasource.url=jdbc:mysql://localhost:3306/hospital_managment_system
    spring.datasource.username=root
-   spring.datasource.password=yourpassword
+   spring.datasource.password=
    
-   stripe.api.key=sk_test_your_stripe_key_here
-   jwt.secret=your_super_secure_jwt_secret_key_here
+   jwt.secret=HospitalManagmentSystemSecretKey2024VeryLongSecretKey
    ```
 
 3. **Run the Spring Boot Application:**
@@ -113,7 +112,7 @@ Follow these steps to get the project running on your local machine.
 | :--- | :--- | :--- |
 | **[Omar Atef]** | Making Patient Module and Frontend | [@Omar22-atef](https://github.com/Omar22-atef) |
 | **[Ahmed Essam]** | Authentication and Security Module | [@Essam66777](https://github.com/Essam66777) |
-| **[Khaled Mohamed]** | Making Doctor Module | [@Khalidm0](https://github.com/Khalidm0) |
+| **[Khaled Mohamed]** | Making Doctor Module and E-mail system Module | [@Khalidm0](https://github.com/Khalidm0) |
 | **[Mahmoud Khaled]** | Making Admin And Paayment Module | [@mahmoudkhaled2005](https://github.com/mahmoudkhaled2005) |
 | **[Abdulrahman Mohamed]** | Making Appointment Module | [@Abdulrahman-Albaiti](https://github.com/Abdulrahman-Albaiti) |
 
